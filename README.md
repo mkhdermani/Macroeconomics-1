@@ -107,6 +107,8 @@ Just like other numerical methods, the bisection method may not always find a ro
 
 ## Example 3
 
+---
+
 Example Two firms compete in a simple Cournot duopoly with the inverse demand and the cost functions
 
 $$
@@ -125,3 +127,31 @@ $$
 \frac{\partial \Pi_k}{\partial q_k}=f(q)=\left(q_1+q_2\right)^{-1 / \eta}-\frac{1}{\eta}\left(q_1+q_2\right)^{-1 / \eta-1} q_k-c_k q_k=0 \text { with } k=1,2 .
 $$
 
+---
+
+This problem involves solving a system of two nonlinear equations. In Julia, we can use the `nlsolve` function from the `NLsolve.jl` package to solve this system. 
+
+Let's suppose that `η = 1.6`, `c1 = 0.6` and `c2 = 0.8`:
+
+```julia
+using NLsolve
+
+η = 1.6
+c1 = 0.6
+c2 = 0.8
+
+function cournot!(F, q)
+    F[1] = (q[1] + q[2])^(-1/η) - (1/η) * (q[1] + q[2])^(-1/η - 1) * q[1] - c1 * q[1]
+    F[2] = (q[1] + q[2])^(-1/η) - (1/η) * (q[1] + q[2])^(-1/η - 1) * q[2] - c2 * q[2]
+end
+
+initial_guess = [0.5, 0.5]
+
+result = nlsolve(cournot!, initial_guess)
+
+println("The equilibrium quantities are ", result.zero)
+```
+
+This code defines the function `cournot!` which calculates the values of the two first-order conditions, given the quantities `q[1]` and `q[2]`. Then, the `nlsolve` function is called to find the quantities that set these two conditions to zero. The result is stored in the `result` object, and the equilibrium quantities can be extracted using `result.zero`. 
+
+Please remember that `nlsolve` uses the Newton's method to find the roots, and that the quality of the solution depends on the initial guess. In this case, the initial guess is `[0.5, 0.5]`, but you may need to adjust it based on your specific problem and domain knowledge.
