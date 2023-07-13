@@ -1,7 +1,7 @@
-# Macroeconomics-1
+# Chapter 2
 Macro of TEIAS
 
-#Example1
+Example 1
 
 ---
 
