@@ -315,3 +315,27 @@ This script first defines an initial guess for acreage `A` and the number of Mon
 Please note that the quality of the solution depends on the number of Monte Carlo draws and the tolerance level for the iteration process. You might need to adjust these parameters based on your specific problem and domain knowledge.
 
 ## Example 6
+
+---
+
+Example Consider a company that produces two goods $x_1$ and $x_2$ on one type of machine. Due to storage capacity, the production is limited to 100 pieces altogether. The production of the two goods requires time and raw material. Good 1 thereby is a time-and cost-intensive production good which requires four hours of production time and raw material worth $€ 20$ per piece. Good 2 is less intensive and can therefore be produced within one hour and with raw material worth $€ 10$. The company owns eight machines which can run 20 hours a day. The remaining time has to be spent on maintenance. In addition, overall costs of raw material should be limited to $€ 1,100$ per day. The two goods can be sold on the market for $€ 120$ and $€ 40$, respectively. What is the optimal production of goods per day for the company?
+
+Table 2.2 summarizes the problem. The goal of the company obviously is to maximize its profits $120 x_1+40 x_2$ subject to the given production constraints. This problem can be written as a linear program in standard form
+
+$$
+\min _{x_1, x_2}-120 x_1-40 x_2, \quad x_1, x_2 \geq 0
+$$
+
+subject to the constraints
+
+$$
+\begin{aligned}
+x_1+x_2 & \leq 100 \\
+4 x_1+x_2 & \leq 160 \\
+20 x_1+10 x_2 & \leq 1100 .
+\end{aligned}
+$$
+
+Note that we again just minimize the negative of the objective function in order to maximize it. The same approach was taken in Section 2.3 that dealt with the minimization of nonlinear functions.
+
+---
