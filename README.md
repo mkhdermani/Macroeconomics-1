@@ -218,3 +218,49 @@ Please ensure that you have the JuMP and Ipopt packages installed and imported. 
 This code defines two variables `x1` and `x2` (with the constraint that they are nonnegative), and then defines an objective function to maximize and a constraint for the budget. The function `optimize!` is then called to solve the problem, and the optimal values of `x1` and `x2` are extracted with the `value` function.
 
 Note that the choice of `p1`, `p2`, and `W` is arbitrary, and you may need to adjust these values based on your specific problem and domain knowledge.
+
+## Example 5
+
+---
+
+Example Consider an agricultural commodity market, where planting decisions are based on the price expected at harvest
+
+$$
+A=0.5+0.5 E(p)
+$$
+
+with $A$ denoting acreage supply and $E(p)$ defining expected price. After the acreage is planted, a normally distributed random yield $y \sim N(1,0.1)$ is realized, giving rise to the quantity $q^s=A y$ which is sold at the market clearing price $p=3-2 q^s$.
+
+In order to solve this system we substitute
+
+$$
+q^s=[0.5+0.5 E(p)] y
+$$
+
+and therefore
+
+$$
+p=3-2[0.5+0.5 E(p)] y .
+$$
+
+Taking expectations on both sides leads to
+
+$$
+E(p)=3-2[0.5+0.5 E(p)] E(y)
+$$
+
+and therefore $E(p)=1$. Consequently, equilibrium acreage is $A=1$. Finally, the equilibrium price distribution has a variance of
+
+$$
+\operatorname{Var}(p)=4[0.5+0.5 E(p)]^2 \operatorname{Var}(y)=4 \operatorname{Var}(y)=0.4 .
+$$
+
+Suppose now that the government introduces a price support program which guarantees each producer a minimum price of 1 . If the market price falls below this level, the government pays the producer the difference per unit produced. Consequently, the producer now receives an effective price of $\max (p, 1)$ and the expected price in $(2.10)$ is then calculated via
+
+$$
+E(p)=E[\max (3-2 A y, 1)]
+$$
+
+The equilibrium acreage supply finally is the supply $A$ that fulfils (2.10) with the above price expectation. Again, this problem cannot be solved analytically.
+
+---
