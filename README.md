@@ -104,3 +104,24 @@ Ensure that you have the Roots package installed and imported in Julia. If you d
 The initial interval from 0.1 to 10.0 is arbitrary, you may need to adjust these values based on your specific problem and domain knowledge.
 
 Just like other numerical methods, the bisection method may not always find a root, especially if the initial interval does not contain any roots or if the function does not satisfy the method's assumptions (in this case, that the function changes sign over the interval).
+
+## Example 3
+
+Example Two firms compete in a simple Cournot duopoly with the inverse demand and the cost functions
+
+$$
+P(q)=q^{-1 / \eta} \quad C_k\left(q_k\right)=\frac{c_k}{2} q_k^2 \quad \text { for firm } k=1,2 \text { with } \quad q=q_1+q_2 .
+$$
+
+Given the profit functions of the two firms
+
+$$
+\Pi_k\left(q_1, q_2\right)=P\left(q_1+q_2\right) q_k-C_k\left(q_k\right)
+$$
+
+each firm $k$ takes the other firm's output as given and chooses its own output level in order to solve
+
+$$
+\frac{\partial \Pi_k}{\partial q_k}=f(q)=\left(q_1+q_2\right)^{-1 / \eta}-\frac{1}{\eta}\left(q_1+q_2\right)^{-1 / \eta-1} q_k-c_k q_k=0 \text { with } k=1,2 .
+$$
+
