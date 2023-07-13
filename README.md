@@ -54,3 +54,50 @@ Ensure that you have the LinearAlgebra package installed and imported in Julia. 
 Please note that the `\` operator assumes that the system of equations is well-determined (i.e., it has a unique solution). If the system of equations is not well-determined (for instance, if it has no solutions or an infinite number of solutions), the `\` operator may not give correct results.
 
 ## Example 2
+
+Example Suppose the demand function in a goods market is given by
+
+$$
+q^d(p)=0.5 p^{-0.2}+0.5 p^{-0.5}
+$$
+
+where the first term denotes domestic demand and the second term export demand. Supply should be inelastic and given by $q^s=2$ units. At what price $p^*$ does the market clear? Setting supply equal to demand leads to the equation
+
+$$
+0.5 p^{-0.2}+0.5 p^{-0.5}=2
+$$
+
+which can be reformulated as
+
+$$
+f(p)=0.5 p^{-0.2}+0.5 p^{-0.5}-2=0 .
+$$
+
+Equation (2.2) exactly has the form $f(p)=0$ described above. The market clearing price consequently is the solution to a nonlinear equation. Note that it is not possible to derive an analytical solution to this problem. Hence, we need a numerical method to solve for $p^*$.
+
+We can use the `Roots.jl` package in Julia which includes a function for the bisection method (`fzero`). 
+
+
+```julia
+using Roots
+
+# Define the function for which we want to find the root
+f(p) = 0.5 * p^(-0.2) + 0.5 * p^(-0.5) - 2
+
+# Initial interval [a,b]
+a = 0.1
+b = 10.0
+
+# Find the root using the bisection method
+p_star = fzero(f, (a, b))
+
+println("The market clearing price is ", p_star)
+```
+
+In this code, `fzero` is the function that implements the bisection method (as well as other root-finding algorithms, depending on the inputs), and `(a, b)` is the initial interval in which to search for a root. 
+
+Ensure that you have the Roots package installed and imported in Julia. If you don't have it, you can install it via `using Pkg; Pkg.add("Roots")`. 
+
+The initial interval from 0.1 to 10.0 is arbitrary, you may need to adjust these values based on your specific problem and domain knowledge.
+
+Just like other numerical methods, the bisection method may not always find a root, especially if the initial interval does not contain any roots or if the function does not satisfy the method's assumptions (in this case, that the function changes sign over the interval).
