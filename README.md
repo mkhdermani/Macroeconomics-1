@@ -190,7 +190,7 @@ using JuMP, Ipopt
 # Parameters
 p1 = 1.0
 p2 = 2.0
-W = 1.0
+W = 10.0
 
 # Define the model
 model = Model(Ipopt.Optimizer)
