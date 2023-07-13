@@ -339,3 +339,52 @@ $$
 Note that we again just minimize the negative of the objective function in order to maximize it. The same approach was taken in Section 2.3 that dealt with the minimization of nonlinear functions.
 
 ---
+
+To solve the given linear programming problem using Julia, we can use the `JuMP` package along with an optimization solver such as `GLPK`.
+
+Here's an example code that formulates and solves the linear program:
+
+```julia
+using JuMP
+using GLPK
+
+# Create a model
+model = Model(with_optimizer(GLPK.Optimizer))
+
+# Variables
+@variable(model, x1 >= 0)
+@variable(model, x2 >= 0)
+
+# Objective function
+@objective(model, Max, 120x1 + 40x2)
+
+# Constraints
+@constraint(model, x1 + x2 <= 100)
+@constraint(model, 4x1 + x2 <= 160)
+@constraint(model, 20x1 + 10x2 <= 1100)
+
+# Solve the model
+optimize!(model)
+
+# Check the status of the solution
+if termination_status(model) == MOI.OPTIMAL
+    # Get the optimal solution
+    optimal_x1 = value(x1)
+    optimal_x2 = value(x2)
+
+    # Print the optimal production
+    println("The optimal production of good 1 is ", optimal_x1)
+    println("The optimal production of good 2 is ", optimal_x2)
+else
+    println("No optimal solution found.")
+end
+```
+
+In this code, we create a `model` using `GLPK.Optimizer` as the solver. We define the variables `x1` and `x2`, the objective function to maximize, and the constraints. Finally, we solve the model using `optimize!` and check the status of the solution.
+
+Please ensure that you have the `JuMP` and `GLPK` packages installed and imported. You can install them via `using Pkg; Pkg.add("JuMP"); Pkg.add("GLPK")`.
+
+Note that the above code assumes the objective function is to maximize the profit, so we use the `Max` keyword in the `@objective` statement. If you want to minimize the negative of the objective function, you can change it to `Min` and negate the coefficients accordingly.
+
+The optimal production of goods 1 and 2 will be printed based on the results of the optimization.
+
