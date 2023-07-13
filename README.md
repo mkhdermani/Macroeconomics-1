@@ -8,11 +8,11 @@ Macro of TEIAS
 Example Consider the supply and demand functions for three goods given by
 
 \[
-\begin{array}{ll}
-q_1^s=-10+p_1 & q_1^d=20-p_1-p_3 \\
-q_2^s=2 p_2 & q_2^d=40-2 p_2-p_3 \\
-q_3^s=-5+p_3 & q_3^d=25-p_1-p_2-p_3
-\end{array}
+\begin{align*}
+q_1^s &= -10 + p_1 & q_1^d &= 20 - p_1 - p_3 \\
+q_2^s &= 2p_2 & q_2^d &= 40 - 2p_2 - p_3 \\
+q_3^s &= -5 + p_3 & q_3^d &= 25 - p_1 - p_2 - p_3
+\end{align*}
 \]
 
 
