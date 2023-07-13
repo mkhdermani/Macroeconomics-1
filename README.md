@@ -342,7 +342,6 @@ Note that we again just minimize the negative of the objective function in order
 
 Certainly! Here's the complete code with explanations:
 
-```julia
 using JuMP
 using GLPK
 
@@ -361,9 +360,6 @@ model = Model(optimizer_with_attributes(GLPK.Optimizer, "msg_lev" => GLPK.GLP_MS
 @constraint(model, 4x1 + x2 <= 160)
 @constraint(model, 20x1 + 10x2 <= 1100)
 
-# Set the solver options
-set_optimizer_attribute(model, "LPMethod", GLPK.GLP_DUAL)
-
 # Solve the model
 optimize!(model)
 
@@ -379,7 +375,7 @@ if termination_status(model) == MOI.OPTIMAL
 else
     println("No optimal solution found.")
 end
-```
+
 
 In this code, we start by importing the necessary packages, `JuMP` and `GLPK`.
 
