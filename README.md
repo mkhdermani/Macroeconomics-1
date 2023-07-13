@@ -1,22 +1,160 @@
 # Macroeconomics-1
 Macro of TEIAS
-Example Consider the supply and demand functions for three goods given by
-$$
-\begin{array}{ll}
-q_1^s=-10+p_1 & q_1^d=20-p_1-p_3 \\
-q_2^s=2 p_2 & q_2^d=40-2 p_2-p_3 \\
-q_3^s=-5+p_3 & q_3^d=25-p_1-p_2-p_3
-\end{array}
-$$
-
-As one can see, the supply of the three goods only depends on their own price, while the demand side shows strong price interdependencies. In order to solve for the equilibrium prices of the system we set supply equal to demand $q_i^s=q_i^d$ in each market which after rearranging yields the linear equation system
-$$
-\begin{aligned}
-2 p_1+p_3 & =30 \\
-4 p_2+p_3 & =40 \\
-p_1+p_2+2 p_3 & =30 .
-\end{aligned}
-$$
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mtable columnalign="left left" columnspacing="1em" rowspacing="4pt">
+    <mtr>
+      <mtd>
+        <mrow>
+          <maligngroup/>
+          <malignmark/>
+          <mrow>
+            <msubsup>
+              <mrow>
+                <mi>q</mi>
+              </mrow>
+              <mn>1</mn>
+              <mi>s</mi>
+            </msubsup>
+            <mo>=</mo>
+            <mo>−</mo>
+            <mn>10</mn>
+            <mo>+</mo>
+            <msub>
+              <mi>p</mi>
+              <mn>1</mn>
+            </msub>
+            <mo>    </mo>
+          </mrow>
+          <maligngroup/>
+          <malignmark/>
+          <mrow>
+            <msubsup>
+              <mrow>
+                <mi>q</mi>
+              </mrow>
+              <mn>1</mn>
+              <mi>d</mi>
+            </msubsup>
+            <mo>=</mo>
+            <mn>20</mn>
+            <mo>−</mo>
+            <msub>
+              <mi>p</mi>
+              <mn>1</mn>
+            </msub>
+            <mo>−</mo>
+            <msub>
+              <mi>p</mi>
+              <mn>3</mn>
+            </msub>
+          </mrow>
+        </mrow>
+      </mtd>
+    </mtr>
+    <mtr>
+      <mtd>
+        <mrow>
+          <maligngroup/>
+          <malignmark/>
+          <mrow>
+            <msubsup>
+              <mrow>
+                <mi>q</mi>
+              </mrow>
+              <mn>2</mn>
+              <mi>s</mi>
+            </msubsup>
+            <mo>=</mo>
+            <mn>2</mn>
+            <msub>
+              <mi>p</mi>
+              <mn>2</mn>
+            </msub>
+            <mo>    </mo>
+          </mrow>
+          <maligngroup/>
+          <malignmark/>
+          <mrow>
+            <msubsup>
+              <mrow>
+                <mi>q</mi>
+              </mrow>
+              <mn>2</mn>
+              <mi>d</mi>
+            </msubsup>
+            <mo>=</mo>
+            <mn>40</mn>
+            <mo>−</mo>
+            <mn>2</mn>
+            <msub>
+              <mi>p</mi>
+              <mn>2</mn>
+            </msub>
+            <mo>−</mo>
+            <msub>
+              <mi>p</mi>
+              <mn>3</mn>
+            </msub>
+          </mrow>
+        </mrow>
+      </mtd>
+    </mtr>
+    <mtr>
+      <mtd>
+        <mrow>
+          <maligngroup/>
+          <malignmark/>
+          <mrow>
+            <msubsup>
+              <mrow>
+                <mi>q</mi>
+              </mrow>
+              <mn>3</mn>
+              <mi>s</mi>
+            </msubsup>
+            <mo>=</mo>
+            <mo>−</mo>
+            <mn>5</mn>
+            <mo>+</mo>
+            <msub>
+              <mi>p</mi>
+              <mn>3</mn>
+            </msub>
+            <mo>    </mo>
+          </mrow>
+          <maligngroup/>
+          <malignmark/>
+          <mrow>
+            <msubsup>
+              <mrow>
+                <mi>q</mi>
+              </mrow>
+              <mn>3</mn>
+              <mi>d</mi>
+            </msubsup>
+            <mo>=</mo>
+            <mn>25</mn>
+            <mo>−</mo>
+            <msub>
+              <mi>p</mi>
+              <mn>1</mn>
+            </msub>
+            <mo>−</mo>
+            <msub>
+              <mi>p</mi>
+              <mn>2</mn>
+            </msub>
+            <mo>−</mo>
+            <msub>
+              <mi>p</mi>
+              <mn>3</mn>
+            </msub>
+          </mrow>
+        </mrow>
+      </mtd>
+    </mtr>
+  </mtable>
+</math>
 
 How to solve it in julia
 To solve this system of linear equations in Julia, you can use the `\` operator, which is used for solving linear systems of equations. First, you need to represent your system of equations as a matrix `A` and a vector `b`, and then you can solve for the vector `x` by evaluating `A\b`.
