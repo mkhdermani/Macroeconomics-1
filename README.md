@@ -251,10 +251,9 @@ $$
 
 and therefore $E(p)=1$. Consequently, equilibrium acreage is $A=1$. Finally, the equilibrium price distribution has a variance of
 
-$$
-\operatorname{Var}(p)=4[0.5+0.5 E(p)]^2 \operatorname{Var}(y)=4 \operatorname{Var}(y)=0.4 .
-$$
-
+```math
+\text{{Var}}(p) = 4[0.5+0.5E(p)]^2 \quad \text{{Var}}(y) = 4 \quad \text{{Var}}(y) = 0.4 .
+```
 Suppose now that the government introduces a price support program which guarantees each producer a minimum price of 1 . If the market price falls below this level, the government pays the producer the difference per unit produced. Consequently, the producer now receives an effective price of $\max (p, 1)$ and the expected price in $(2.10)$ is then calculated via
 
 $$
