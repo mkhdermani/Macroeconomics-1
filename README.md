@@ -54,7 +54,7 @@ Ensure that you have the LinearAlgebra package installed and imported in Julia. 
 Please note that the `\` operator assumes that the system of equations is well-determined (i.e., it has a unique solution). If the system of equations is not well-determined (for instance, if it has no solutions or an infinite number of solutions), the `\` operator may not give correct results.
 
 ## Example 2
-
+---
 Example Suppose the demand function in a goods market is given by
 
 $$
@@ -76,7 +76,7 @@ $$
 Equation (2.2) exactly has the form $f(p)=0$ described above. The market clearing price consequently is the solution to a nonlinear equation. Note that it is not possible to derive an analytical solution to this problem. Hence, we need a numerical method to solve for $p^*$.
 
 We can use the `Roots.jl` package in Julia which includes a function for the bisection method (`fzero`). 
-
+---
 
 ```julia
 using Roots
