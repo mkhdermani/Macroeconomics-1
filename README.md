@@ -3,6 +3,8 @@ Macro of TEIAS
 
 #Example1
 
+---
+
 Example Consider the supply and demand functions for three goods given by
 
 \[
@@ -23,6 +25,7 @@ p_1+p_2+2p_3 & =30 .
 \end{align*}
 \]
 
+---
 To solve this system of linear equations in Julia, you can use the `\` operator, which is used for solving linear systems of equations. First, you need to represent your system of equations as a matrix `A` and a vector `b`, and then you can solve for the vector `x` by evaluating `A\b`.
 
 Here is the corresponding Julia code:
