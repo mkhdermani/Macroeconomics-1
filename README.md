@@ -8,21 +8,22 @@ Macro of TEIAS
 Example Consider the supply and demand functions for three goods given by
 
 \[
-\begin{align*}
-q_1^s=-10+p_1 & \quad q_1^d=20-p_1-p_3 \\
-q_2^s=2p_2 & \quad q_2^d=40-2p_2-p_3 \\
-q_3^s=-5+p_3 & \quad q_3^d=25-p_1-p_2-p_3
-\end{align*}
+\begin{array}{ll}
+q_1^s=-10+p_1 & q_1^d=20-p_1-p_3 \\
+q_2^s=2 p_2 & q_2^d=40-2 p_2-p_3 \\
+q_3^s=-5+p_3 & q_3^d=25-p_1-p_2-p_3
+\end{array}
 \]
+
 
 As one can see, the supply of the three goods only depends on their own price, while the demand side shows strong price interdependencies. In order to solve for the equilibrium prices of the system, we set supply equal to demand \(q_i^s=q_i^d\) in each market, which after rearranging yields the linear equation system
 
 \[
-\begin{align*}
-2p_1+p_3 & =30 \\
-4p_2+p_3 & =40 \\
-p_1+p_2+2p_3 & =30 .
-\end{align*}
+\begin{aligned}
+2 p_1+p_3 & =30 \\
+4 p_2+p_3 & =40 \\
+p_1+p_2+2 p_3 & =30 .
+\end{aligned}
 \]
 
 ---
