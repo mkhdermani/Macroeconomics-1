@@ -155,3 +155,66 @@ println("The equilibrium quantities are ", result.zero)
 This code defines the function `cournot!` which calculates the values of the two first-order conditions, given the quantities `q[1]` and `q[2]`. Then, the `nlsolve` function is called to find the quantities that set these two conditions to zero. The result is stored in the `result` object, and the equilibrium quantities can be extracted using `result.zero`. 
 
 Please remember that `nlsolve` uses the Newton's method to find the roots, and that the quality of the solution depends on the initial guess. In this case, the initial guess is `[0.5, 0.5]`, but you may need to adjust it based on your specific problem and domain knowledge.
+
+## Example 4
+
+---
+
+Example A household can consume two goods $x_1$ and $x_2$. It values the consumption of those goods with the joint utility function
+
+$$
+u\left(x_1, x_2\right)=x_1^{0.4}+\left(1+x_2\right)^{0.5} \text {. }
+$$
+
+Here $x_2$ acts as a luxury good, i.e. the household will only consume $x_2$, if its available resources $W$ are large enough. $x_1$ on the other hand is a normal good and will always be consumed. Naturally, we have to assume that $x_1, x_2 \geq 0$. With the prices for the goods being $p_1$ and $p_2$, the household has to solve the optimization problem
+
+$$
+\max _{x_1, x_2 \geq 0} x_1^{0.4}+\left(1+x_2\right)^{0.5} \quad \text { s.t. } \quad p_1 x_1+p_2 x_2=W .
+$$
+
+Note that there is no analytical solution to this problem.
+
+---
+
+This is a constrained optimization problem. In this case, the constraint is the household's budget. 
+
+The utility maximization problem involves maximizing a function subject to a constraint. In this case, we want to maximize the utility function `u(x1, x2) = x1^0.4 + (1 + x2)^0.5` subject to the budget constraint `p1*x1 + p2*x2 = W`.
+
+In Julia, the `JuMP.jl` and `Ipopt.jl` packages can be used to solve this problem. `JuMP` is a package for defining and solving optimization models, and `Ipopt` is a solver that can handle non-linear optimization problems.
+
+Here is an example of how to solve this problem, assuming that `p1 = 1`, `p2 = 2`, and `W = 10`:
+
+```julia
+using JuMP, Ipopt
+
+# Parameters
+p1 = 1.0
+p2 = 2.0
+W = 10.0
+
+# Define the model
+model = Model(Ipopt.Optimizer)
+
+@variable(model, x1 >= 0)
+@variable(model, x2 >= 0)
+
+@NLobjective(model, Max, x1^0.4 + (1 + x2)^0.5)
+
+@constraint(model, p1*x1 + p2*x2 == W)
+
+# Solve the model
+optimize!(model)
+
+# Get the optimal solution
+optimal_x1 = value(x1)
+optimal_x2 = value(x2)
+
+println("The optimal consumption of good 1 is ", optimal_x1)
+println("The optimal consumption of good 2 is ", optimal_x2)
+```
+
+Please ensure that you have the JuMP and Ipopt packages installed and imported. You can install them via `using Pkg; Pkg.add("JuMP"); Pkg.add("Ipopt")`.
+
+This code defines two variables `x1` and `x2` (with the constraint that they are nonnegative), and then defines an objective function to maximize and a constraint for the budget. The function `optimize!` is then called to solve the problem, and the optimal values of `x1` and `x2` are extracted with the `value` function.
+
+Note that the choice of `p1`, `p2`, and `W` is arbitrary, and you may need to adjust these values based on your specific problem and domain knowledge.
