@@ -1,6 +1,8 @@
 # Macroeconomics-1
 Macro of TEIAS
+
 #Exaple1
+
 <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
   <mtable columnalign="left left" columnspacing="1em" rowspacing="4pt">
     <mtr>
