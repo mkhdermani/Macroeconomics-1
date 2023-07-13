@@ -340,8 +340,7 @@ Note that we again just minimize the negative of the objective function in order
 
 ---
 
-Certainly! Here's the complete code with explanations:
-
+```julia
 using JuMP
 using GLPK
 
@@ -375,23 +374,21 @@ if termination_status(model) == MOI.OPTIMAL
 else
     println("No optimal solution found.")
 end
+```
 
+In this code, we first import the necessary packages, `JuMP` and `GLPK`.
 
-In this code, we start by importing the necessary packages, `JuMP` and `GLPK`.
+Next, we create the optimization model using `model = Model(optimizer_with_attributes(GLPK.Optimizer, "msg_lev" => GLPK.GLP_MSG_OFF))`. This line creates a new model object named `model` and sets GLPK as the optimizer for solving the model. The `"msg_lev" => GLPK.GLP_MSG_OFF` option is used to turn off the solver's output messages.
 
-We then create the optimization model using `model = Model(optimizer_with_attributes(GLPK.Optimizer, "msg_lev" => GLPK.GLP_MSG_OFF))`. This line sets up the model with GLPK as the solver and turns off the solver's output messages.
+We then define the decision variables `x1` and `x2` using the `@variable` macro. The `x1` and `x2` variables represent the production quantities of goods 1 and 2, respectively. The `>= 0` constraint ensures that the variables are nonnegative.
 
-Next, we define the decision variables `x1` and `x2` using `@variable(model, x1 >= 0)` and `@variable(model, x2 >= 0)`. These variables represent the production quantities of goods 1 and 2, respectively.
+The objective function is defined using `@objective(model, Max, 120x1 + 40x2)`, which specifies that we want to maximize the total profit. The objective function is the sum of the profits from producing goods 1 and 2.
 
-The objective function is defined with `@objective(model, Max, 120x1 + 40x2)`, specifying that we want to maximize the total profit, which is the sum of the profits from producing goods 1 and 2.
+The constraints are defined using `@constraint(model, ...)` statements. We have three constraints in this case: the total production should not exceed 100 units (`x1 + x2 <= 100`), the total production time of goods 1 and 2 should not exceed 160 hours (`4x1 + x2 <= 160`), and the total cost of raw materials should not exceed 1100 (`20x1 + 10x2 <= 1100`).
 
-The constraints are defined using `@constraint(model, ...)` statements. We have three constraints: the total production should not exceed 100 units, the total production time of goods 1 and 2 should not exceed 160 hours, and the total cost of raw materials should not exceed 1100.
+After defining the model, we call `optimize!(model)` to solve the model using the GLPK optimizer.
 
-Next, we set the solver options using `set_optimizer_attribute(model, "LPMethod", GLPK.GLP_DUAL)`. This line sets the solver to use the dual simplex method for solving the linear programming relaxation of the model.
-
-We then solve the model using `optimize!(model)`. The solver will find the optimal solution that maximizes the objective function while satisfying the given constraints.
-
-After solving the model, we check the status of the solution using `termination_status(model)`. If the status is `MOI.OPTIMAL`, which represents an optimal solution, we retrieve the optimal values of `x1` and `x2` using `value(x1)` and `value(x2)`.
+We then check the status of the solution using `termination_status(model)`. If the status is `MOI.OPTIMAL`, which represents an optimal solution, we retrieve the optimal values of `x1` and `x2` using the `value` function. These values represent the optimal production quantities of goods 1 and 2.
 
 Finally, we print the optimal production quantities of goods 1 and 2 using `println`. If the solver does not find an optimal solution, we print a message indicating that no optimal solution was found.
 
