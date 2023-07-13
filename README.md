@@ -1,7 +1,7 @@
 # Chapter 2
-Macro of TEIAS
+### Macro of TEIAS
 
-Example 1
+## Example 1
 
 ---
 
@@ -52,3 +52,5 @@ Just replace the `A` and `b` arrays with your coefficients and constants, and th
 Ensure that you have the LinearAlgebra package installed and imported in Julia. If you don't have it, you can install it via `using Pkg; Pkg.add("LinearAlgebra")`.
 
 Please note that the `\` operator assumes that the system of equations is well-determined (i.e., it has a unique solution). If the system of equations is not well-determined (for instance, if it has no solutions or an infinite number of solutions), the `\` operator may not give correct results.
+
+## Example 2
