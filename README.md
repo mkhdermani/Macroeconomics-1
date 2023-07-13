@@ -77,9 +77,9 @@ $$
 
 Equation (2.2) exactly has the form $f(p)=0$ described above. The market clearing price consequently is the solution to a nonlinear equation. Note that it is not possible to derive an analytical solution to this problem. Hence, we need a numerical method to solve for $p^*$.
 
-We can use the `Roots.jl` package in Julia which includes a function for the bisection method (`fzero`). 
-
 ---
+
+We can use the `Roots.jl` package in Julia which includes a function for the bisection method (`fzero`). 
 
 ```julia
 using Roots
