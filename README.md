@@ -340,16 +340,14 @@ Note that we again just minimize the negative of the objective function in order
 
 ---
 
-To solve the given linear programming problem using Julia, we can use the `JuMP` package along with an optimization solver such as `GLPK`.
-
-Here's an example code that formulates and solves the linear program:
+Certainly! Here's the complete code with explanations:
 
 ```julia
 using JuMP
 using GLPK
 
 # Create a model
-model = Model(with_optimizer(GLPK.Optimizer))
+model = Model(optimizer_with_attributes(GLPK.Optimizer, "msg_lev" => GLPK.GLP_MSG_OFF))
 
 # Variables
 @variable(model, x1 >= 0)
@@ -362,6 +360,9 @@ model = Model(with_optimizer(GLPK.Optimizer))
 @constraint(model, x1 + x2 <= 100)
 @constraint(model, 4x1 + x2 <= 160)
 @constraint(model, 20x1 + 10x2 <= 1100)
+
+# Set the solver options
+set_optimizer_attribute(model, "LPMethod", GLPK.GLP_DUAL)
 
 # Solve the model
 optimize!(model)
@@ -380,11 +381,22 @@ else
 end
 ```
 
-In this code, we create a `model` using `GLPK.Optimizer` as the solver. We define the variables `x1` and `x2`, the objective function to maximize, and the constraints. Finally, we solve the model using `optimize!` and check the status of the solution.
+In this code, we start by importing the necessary packages, `JuMP` and `GLPK`.
 
-Please ensure that you have the `JuMP` and `GLPK` packages installed and imported. You can install them via `using Pkg; Pkg.add("JuMP"); Pkg.add("GLPK")`.
+We then create the optimization model using `model = Model(optimizer_with_attributes(GLPK.Optimizer, "msg_lev" => GLPK.GLP_MSG_OFF))`. This line sets up the model with GLPK as the solver and turns off the solver's output messages.
 
-Note that the above code assumes the objective function is to maximize the profit, so we use the `Max` keyword in the `@objective` statement. If you want to minimize the negative of the objective function, you can change it to `Min` and negate the coefficients accordingly.
+Next, we define the decision variables `x1` and `x2` using `@variable(model, x1 >= 0)` and `@variable(model, x2 >= 0)`. These variables represent the production quantities of goods 1 and 2, respectively.
 
-The optimal production of goods 1 and 2 will be printed based on the results of the optimization.
+The objective function is defined with `@objective(model, Max, 120x1 + 40x2)`, specifying that we want to maximize the total profit, which is the sum of the profits from producing goods 1 and 2.
 
+The constraints are defined using `@constraint(model, ...)` statements. We have three constraints: the total production should not exceed 100 units, the total production time of goods 1 and 2 should not exceed 160 hours, and the total cost of raw materials should not exceed 1100.
+
+Next, we set the solver options using `set_optimizer_attribute(model, "LPMethod", GLPK.GLP_DUAL)`. This line sets the solver to use the dual simplex method for solving the linear programming relaxation of the model.
+
+We then solve the model using `optimize!(model)`. The solver will find the optimal solution that maximizes the objective function while satisfying the given constraints.
+
+After solving the model, we check the status of the solution using `termination_status(model)`. If the status is `MOI.OPTIMAL`, which represents an optimal solution, we retrieve the optimal values of `x1` and `x2` using `value(x1)` and `value(x2)`.
+
+Finally, we print the optimal production quantities of goods 1 and 2 using `println`. If the solver does not find an optimal solution, we print a message indicating that no optimal solution was found.
+
+Make sure you have the JuMP and GLPK packages installed and imported. If you encounter any errors, ensure that you have the latest versions of the packages by running `using Pkg; Pkg.update()`.
