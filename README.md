@@ -7,24 +7,23 @@ Macro of TEIAS
 
 Example Consider the supply and demand functions for three goods given by
 
-\[
+```math
 \begin{align*}
 q_1^s &= -10 + p_1 & q_1^d &= 20 - p_1 - p_3 \\
 q_2^s &= 2p_2 & q_2^d &= 40 - 2p_2 - p_3 \\
 q_3^s &= -5 + p_3 & q_3^d &= 25 - p_1 - p_2 - p_3
 \end{align*}
-\]
-
+```
 
 As one can see, the supply of the three goods only depends on their own price, while the demand side shows strong price interdependencies. In order to solve for the equilibrium prices of the system, we set supply equal to demand \(q_i^s=q_i^d\) in each market, which after rearranging yields the linear equation system
 
-\[
+```math
 \begin{aligned}
 2 p_1+p_3 & =30 \\
 4 p_2+p_3 & =40 \\
 p_1+p_2+2 p_3 & =30 .
 \end{aligned}
-\]
+```
 
 ---
 To solve this system of linear equations in Julia, you can use the `\` operator, which is used for solving linear systems of equations. First, you need to represent your system of equations as a matrix `A` and a vector `b`, and then you can solve for the vector `x` by evaluating `A\b`.
