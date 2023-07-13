@@ -263,3 +263,55 @@ $$
 The equilibrium acreage supply finally is the supply $A$ that fulfils (2.10) with the above price expectation. Again, this problem cannot be solved analytically.
 
 ---
+
+This is a fairly complex problem which involves solving for the equilibrium given an expected price which depends on a support price mechanism. 
+
+The problem can be solved using Monte Carlo simulations. The idea is to simulate the price distribution under the new policy and then adjust the acreage until the expected price is consistent with the acreage choice. 
+
+In Julia, we can use the `Distributions.jl` package to generate draws from the yield distribution, and then calculate the corresponding price, taking into account the support price. We can then use a simple iteration process to find the equilibrium acreage.
+
+Here is a sample code on how you might implement this in Julia:
+
+```julia
+using Distributions
+using Statistics
+
+# Initial parameters
+A = 0.5  # initial guess for acreage
+n_draws = 10000  # number of Monte Carlo draws
+yield_dist = Normal(1, 0.1)  # distribution of yields
+
+# Function to calculate the effective price given acreage and yield
+function effective_price(A, y)
+    p = 3 - 2 * A * y
+    return max(p, 1)  # apply price support
+end
+
+# Monte Carlo simulation
+function calculate_expected_price(A)
+    y_draws = rand(yield_dist, n_draws)  # draw yields
+    p_draws = effective_price.(A, y_draws)  # calculate prices
+    return mean(p_draws)  # calculate expected price
+end
+
+# Iteration process
+tol = 1e-5
+max_iter = 1000
+for i in 1:max_iter
+    E_p = calculate_expected_price(A)
+    A_new = 0.5 + 0.5 * E_p
+    if abs(A_new - A) < tol
+        break
+    else
+        A = A_new
+    end
+end
+
+println("The equilibrium acreage is ", A)
+```
+
+This script first defines an initial guess for acreage `A` and the number of Monte Carlo draws `n_draws`, then defines the yield distribution. The `effective_price` function calculates the price given the acreage and yield, taking into account the price support mechanism. The `calculate_expected_price` function then calculates the expected price given the acreage by drawing yields from the yield distribution, calculating the corresponding prices, and then calculating the average price. Finally, an iteration process is performed to find the acreage that leads to an expected price that is consistent with the acreage choice.
+
+Please note that the quality of the solution depends on the number of Monte Carlo draws and the tolerance level for the iteration process. You might need to adjust these parameters based on your specific problem and domain knowledge.
+
+## Example 6
