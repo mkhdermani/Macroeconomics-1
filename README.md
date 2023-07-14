@@ -1314,138 +1314,154 @@ for newspapers and advertisements, respectively. Compute the profitmaximizing pr
 
 ---
 
-(a) To construct a two-dimensional spline approximation of the profit function, we'll follow the steps outlined in the question:
+In this problem, we have a local newspaper that has a monopoly in its region and serves two customer groups: readers and advertisers. The newspaper can set prices for readers ($p_R$) and advertisers ($p_A$) to maximize its profits. However, changing the prices may affect the demand for both newspapers and advertisements.
 
-1. Set up two equidistant price grids PR and PA on the interval [0.5, 12.5] using the subroutine grid_Cons_Equi.
-2. Initialize an empty matrix G with size (N, N), where N is the number of grid points.
-3. Fill the matrix G with the given profit values.
-4. Use the spline_interp function to obtain the spline coefficients coeff_G for the profit function.
-5. Evaluate the profit function Gplot at each grid point using the spline_eval function.
-6. Find the location of the maximum profit using the maxloc function.
+To find the optimal price combination ($p_R^*$, $p_A^*$) that maximizes profits, the newspaper's managers conducted experiments by varying the prices and observing the resulting profits. They recorded the profits in a table, where rows represent different values of $p_R$, columns represent different values of $p_A$, and the values in the cells represent the corresponding profits.
 
-Here's an example implementation in Julia:
+To construct a two-dimensional spline approximation of the profit function, we need to set up two equidistant price grids: one for $p_R$ and one for $p_A$. We'll use the interval [0.5, 12.5] and divide it into four equally spaced points for each grid using a subroutine called "grid_Cons_Equi."
+
+Once we have the price grids, we can derive the spline coefficients, which will help us approximate the profit function. We can use another subroutine called "spline_interp" to calculate these coefficients using the profits recorded in the table.
+
+With the spline coefficients in hand, we can evaluate the profit function at each grid point using the "spline_eval" function. This will give us the profit values for different combinations of $p_R$ and $p_A$. We'll create a grid of points to evaluate the profit function, and the size of this grid is determined by the variable "Nplot."
+
+Finally, to find the location of the maximum profit, we can use the function "maxloc" to identify the grid point with the highest profit value. This point will correspond to the optimal price combination ($p_R^*$, $p_A^*$) that maximizes the newspaper's profits.
+
+By following these steps, we can determine the optimal price combination and the resulting optimal profit $G(p_R^*, p_A^*)$.
 
 ```julia
 using Interpolations
 
-# Set up an equidistant price grid
-function grid_Cons_Equi(p_min, p_max, N)
-    return range(p_min, p_max, length=N)
-end
+# Define the profit table
+profits = [
+    11.5  70.9  98.3  93.7
+    31.1  82.5 101.9  89.3
+    18.7  62.1  73.5  52.9
+   -25.7   9.7  13.1 -15.5
+]
 
-# Profit data
-G = [11.5 70.9 98.3 93.7;
-     31.1 82.5 101.9 89.3;
-     18.7 62.1 73.5 52.9;
-     -25.7 9.7 13.1 -15.5]
+# Set up the price grids
+PR = range(0.5, stop=12.5, length=4)
+PA = range(0.5, stop=12.5, length=4)
 
-# Parameters
-N = 4
+# Construct the spline approximation
+spline_approx = interpolate((PR, PA), profits, Gridded(Linear()))
 
-# Set up price grids
-PR = grid_Cons_Equi(0.5, 12.5, N)
-PA = grid_Cons_Equi(0.5, 12.5, N)
+# Define the grid for evaluating the profit function
+Nplot = 100
+PR_plot = range(0.5, stop=12.5, length=Nplot)
+PA_plot = range(0.5, stop=12.5, length=Nplot)
 
-# Calculate spline coefficients for profit function
-interp_G = spline_interp((PR, PA), G)
+# Evaluate the profit function at each grid point
+Gplot = [spline_approx[pR, pA] for pR in PR_plot, pA in PA_plot]
 
-# Evaluate profit function at each grid point
-Gplot = zeros(N, N)
-for i in 1:N
-    for j in 1:N
-        Gplot[i, j] = interp_G(PR[i], PA[j])
-    end
-end
+# Find the location of the maximum profit
+max_profit = maximum(Gplot)
+max_loc = argmax(Gplot)
 
-# Find location of maximum profit
-max_profit_index = argmax(Gplot)
-pR_opt, pA_opt = PR[max_profit_index[1]], PA[max_profit_index[2]]
-G_opt = Gplot[max_profit_index[1], max_profit_index[2]]
+# Retrieve the optimal price combination and profit
+pR_optimal = PR_plot[max_loc[1]]
+pA_optimal = PA_plot[max_loc[2]]
+G_optimal = max_profit
 
-println("Optimal price combination: pR = ", pR_opt, ", pA = ", pA_opt)
-println("Optimal profit: G(pR, pA) = ", G_opt)
+# Print the optimal price combination and profit
+println("Optimal Price Combination: pR = ", pR_optimal, ", pA = ", pA_optimal)
+println("Optimal Profit: G(pR, pA) = ", G_optimal)
 ```
-
-The code will calculate the optimal price combination (pR_opt, pA_opt) and the resulting optimal profit G_opt using a spline approximation of the profit function.
-
-(b) To compute the profit-maximizing price combination using the "true" demand functions, we can set up an optimization problem using either fminsearch or fzero (root-finding) algorithms. Let's use the fminsearch algorithm in this case. Here's an example implementation in Julia:
+To use the `optimize` function, we define an objective function that we want to maximize or minimize, and we provide an initial guess for the optimal values. The `optimize` function then finds the optimal values that maximize or minimize the objective function.
 
 ```julia
 using Optim
 
-# True demand functions
-function demand_R(pR)
+# Define the marginal cost
+c = 0.1
+
+# Define the demand functions
+function xR_demand(pR)
     return 10 - pR
 end
 
-function demand_A(pR, pA)
+function xA_demand(pR, pA)
     return 20 - pA - 0.5 * pR
 end
 
-# Cost parameter
-c = 0.1
-
 # Define the profit function
-function profit(pR_pA)
-    pR, pA = pR_pA
-    xR = demand_R(pR)
-    xA = demand_A(pR, pA)
-    return (pR - c) * xR + (pA - c) * xA
+function profit(pR, pA)
+    xR = xR_demand(pR)
+    xA = xA_demand(pR, pA)
+    revenue = pR * xR + pA * xA
+    cost = c * (xR + xA)
+    return revenue - cost
 end
 
-# Set up the optimization problem
-result = optimize(profit, [0.5, 0.5], NelderMead())
+# Define the negative profit function (for maximization)
+function neg_profit(params)
+    return -profit(params[1], params[2])
+end
+
+# Set initial guess for prices
+initial_prices = [5.0, 5.0]
+
+# Find the profit-maximizing price combination
+result = optimize(neg_profit, initial_prices, NelderMead())
 
 # Retrieve the optimal price combination and profit
-pR_opt, pA_opt = result.minimum
-G_opt = -result.minimum_obj_value  # negate the objective value to obtain profit
+optimal_prices = Optim.minimizer(result)
+optimal_profit = -Optim.minimum(result)
 
-println("Optimal price combination (using true demand functions): pR = ", pR_opt, ", pA = ", pA_opt)
-println("Optimal profit (using true demand functions): G(pR, pA) = ", G_opt)
+# Print the optimal price combination and profit
+println("Optimal Price Combination: pR = ", optimal_prices[1], ", pA = ", optimal_prices[2])
+println("Optimal Profit: ", optimal_profit)
 ```
 
-The code will use the fminsearch algorithm from the Optim package to find the profit-maximizing price combination (pR_opt, pA_opt) and the resulting optimal profit G_opt using the "true" demand functions.
+In this code, we use the `Optim` package to perform the optimization. We define the marginal cost `c`, the demand functions `xR_demand` and `xA_demand`, and the profit function `profit` as before.
 
-(c) To compare the approximation error, we'll calculate the error between the true profit function and the spline approximation for different values of Nplot (number of grid points). Here's an example implementation in Julia:
+We then define the negative profit function `neg_profit` since the `optimize` function minimizes the objective function by default. By negating the profit function, we effectively maximize the profit.
+
+We set an initial guess for the prices (`initial_prices`) and use the `optimize` function with the Nelder-Mead algorithm to find the profit-maximizing price combination.
+
+Finally, we retrieve the optimal price combination and profit from the optimization result and print them to the console.
 
 ```julia
-# Parameters
+using Interpolations
+using LinearAlgebra
+
+# Define the profit table
+profits = [
+    11.5  70.9  98.3  93.7
+    31.1  82.5 101.9  89.3
+    18.7  62.1  73.5  52.9
+   -25.7   9.7  13.1 -15.5
+]
+
+# Set up the price grids
+PR = range(0.5, stop=12.5, length=4)
+PA = range(0.5, stop=12.5, length=4)
+
+# Construct the spline approximation
+spline_approx = interpolate((PR, PA), profits, Gridded(Linear()))
+
+# Define the grid sizes for evaluation
 Nplot_values = [100, 1000, 10000]
 
-# Calculate true profit function values
-true_G = zeros(N, N)
-for i in 1:N
-    for j in 1:N
-        true_G[i, j] = profit([PR[i], PA[j]])
-    end
-end
-
-# Calculate approximation error for each Nplot value
+# Calculate approximation errors for different grid sizes
 for Nplot in Nplot_values
-    # Set up price grids for approximation
-    PR_approx = grid_Cons_Equi(0.5, 12.5, Nplot)
-    PA_approx = grid_Cons_Equi(0.5, 12.5, Nplot)
+    # Define the grid for evaluating the profit function
+    PR_plot = range(0.5, stop=12.5, length=Nplot)
+    PA_plot = range(0.5, stop=12.5, length=Nplot)
 
-    # Calculate spline coefficients for approximation
-    interp_G_approx = spline_interp((PR, PA), G)
+    # Evaluate the true profit function at each grid point
+    true_profits = [profit(pR, pA) for pR in PR_plot, pA in PA_plot]
 
-    # Evaluate approximation at each grid point
-    G_approx = zeros(Nplot, Nplot)
-    for i in 1:Nplot
-        for j in 1:Nplot
-            G_approx[i, j] = interp_G_approx(PR_approx[i], PA_approx[j])
-        end
-    end
+    # Evaluate the spline approximation at each grid point
+    spline_profits = [spline_approx[pR, pA] for pR in PR_plot, pA in PA_plot]
 
-    # Calculate approximation error
-    error = norm(true_G - G_approx) / norm(true_G)
+    # Calculate the approximation error
+    error = norm(spline_profits - true_profits)
 
-    println("Approximation error (Nplot = $Nplot): ", error)
+    # Print the approximation error
+    println("Approximation Error (Nplot = $Nplot): ", error)
 end
 ```
-
-The code will calculate the approximation error between the true profit function and the spline approximation for different values of Nplot. It uses the norm function to calculate the error as the normalized difference between the matrices. The approximation error is printed for each Nplot value specified in the Nplot_values array.
-
 ## Exercise 11
 
 ---
