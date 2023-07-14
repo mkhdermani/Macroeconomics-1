@@ -547,17 +547,23 @@ The matrix product of A and x should be equal to vector b.
 ---
 
 2.2. Consider the following intertemporal household problem: The utility function the household is given by
+
 $$
 U\left(c_1, c_2\right)=\frac{c_1^{1-\frac{1}{\gamma}}}{1-\frac{1}{\gamma}}+\beta \frac{c_2^{1-\frac{1}{\gamma}}}{1-\frac{1}{\gamma}}
 $$
+
 with $c_1$ and $c_2$ denoting consumption in the first and the second period, respectivel $\gamma$ is the intertemporal elasticity of substitution and $\beta$ defines the time discour factor. The household receives labour income $w$ in the first period and does nc work in the second period. Consequently, the budget constraint is
+
 $$
 c_1+\frac{c_2}{1+r}=w
 $$
+
 where $r$ defines the interest rate.
+
 (a) Define the Lagrangian for this specific optimization problem and derive first-order conditions with respect to $c_1, c_2$, and $\lambda$. Solve the equation syster analytically using parameter values $\gamma=0.5, \beta=1, r=0$, and $w=1$.
 
 (b) Solve the equation system resulting from a) using function fzero from the toolbox. Print the results and compare the numerical results with the analytical solutions.
+
 (c) Solve the household problem using the subroutine fminsearch and compare the results.
 
 ---
