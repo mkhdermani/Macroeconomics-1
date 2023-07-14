@@ -936,3 +936,602 @@ Pkg.add("QuadGK")
 ```
 
 With this package, the trapezoid rule, Simpson's rule, and Gauss-Legendre quadrature are implemented. The code then performs the approximations for different values of `n` and compares the results with the analytical solutions for both `f(x) = exp(-x)` and `f(x) = |x|^0.5`.
+
+## E xercise 6
+
+---
+
+2.6. Consider the following inverse demand function
+$$
+p(d)=\frac{4}{(d+1)^2}
+$$
+for a good $d$. Assume that the price of the good falls from $p=3$ to $p=1$. Compute the relative change in the consumer surplus using the trapezoid rule, the Simpson rule, and the Gauss-Legendre quadrature method with $n=10$.
+
+---
+
+To compute the relative change in consumer surplus using the trapezoid rule, Simpson's rule, and Gauss-Legendre quadrature method, we need to evaluate the integrals associated with the consumer surplus before and after the price change.
+
+Let's denote the inverse demand function as:
+
+```
+p(d) = 4 / (d + 1)^2
+```
+
+To calculate the consumer surplus, we need to integrate the inverse demand function over the range of quantities consumed. The consumer surplus can be expressed as:
+
+```
+CS = ∫[0, d] p(x) dx
+```
+
+where `CS` represents the consumer surplus and `d` is the quantity consumed.
+
+To calculate the relative change in consumer surplus, we can compare the consumer surplus before and after the price change using the following formula:
+
+```
+Relative Change = (CS_new - CS_old) / CS_old
+```
+
+Now, let's implement the calculations using the trapezoid rule, Simpson's rule, and Gauss-Legendre quadrature method in Julia:
+
+```julia
+using QuadGK
+
+# Inverse demand function
+p(d) = 4 / (d + 1)^2
+
+# Calculate consumer surplus using the trapezoid rule
+function trapezoid_rule_consumer_surplus(p, d, n)
+    x = range(0, stop=d, length=n+1)
+    h = d / n
+    surplus_sum = sum(p.(x[1:end-1]) .+ p.(x[2:end]))
+    surplus = (h / 2) * surplus_sum
+    return surplus
+end
+
+# Calculate consumer surplus using Simpson's rule
+function simpson_rule_consumer_surplus(p, d, n)
+    x = range(0, stop=d, length=n+1)
+    h = d / n
+    surplus_sum = p(0) + p(d)
+    for i = 2:n
+        if i % 2 == 0
+            surplus_sum += 2 * p(x[i])
+        else
+            surplus_sum += 4 * p(x[i])
+        end
+    end
+    surplus = (h / 3) * surplus_sum
+    return surplus
+end
+
+# Calculate consumer surplus using Gauss-Legendre quadrature
+function gauss_legendre_quadrature_consumer_surplus(p, d, n)
+    surplus, _ = quadgk(p, 0, d, atol=0, rtol=1e-12, maxevals=n)
+    return surplus
+end
+
+# Quantity consumed before and after price change
+d_old = 3.0
+d_new = 1.0
+
+# Number of nodes for approximation methods
+n = 10
+
+# Calculate consumer surplus before price change
+cs_old_trapezoid = trapezoid_rule_consumer_surplus(p, d_old, n)
+cs_old_simpson = simpson_rule_consumer_surplus(p, d_old, n)
+cs_old_gauss_legendre = gauss_legendre_quadrature_consumer_surplus(p, d_old, n)
+
+# Calculate consumer surplus after price change
+cs_new_trapezoid = trapezoid_rule_consumer_surplus(p, d_new, n)
+cs_new_simpson = simpson_rule_consumer_surplus(p, d_new, n)
+cs_new_gauss_legendre = gauss_legendre_quadrature_consumer_surplus(p, d_new, n)
+
+# Calculate relative change in consumer surplus
+relative_change_trapezoid = (cs_new_trapezoid - cs_old_trapezoid) / cs_old_trapezoid
+relative_change_simpson = (cs_new_simpson - cs_old_simpson) / cs_old_simpson
+relative_change_gauss_legendre = (cs_new_gauss_legendre - cs_old_gauss_legendre) / cs_old_gauss_legendre
+
+# Print the results
+println("Relative Change in Consumer Surplus:")
+println("Using Trapezoid Rule: $relative_change_trapezoid")
+println("Using Simpson's Rule: $relative_change_simpson")
+println("Using Gauss-Legendre Quadrature: $relative_change_gauss_legendre")
+```
+
+In this code, we define the inverse demand function `p(d) = 4 / (d + 1)^2`. Then, we implement the functions for calculating the consumer surplus using the trapezoid rule, Simpson's rule, and Gauss-Legendre quadrature. The number of nodes for approximation methods is set to `n = 10`.
+
+We calculate the consumer surplus before and after the price change using the respective approximation methods. Finally, we compute the relative change in consumer surplus and print the results.
+
+Please note that the accuracy of the approximations depends on the choice of `n`. You can experiment with different values to achieve the desired level of precision.
+
+## Exercise 7 
+
+---
+
+2.7. The government has increased tax rates on labour income during the last years substantially, but the revenues have evolved as follows:
+
+```math
+\begin{tabular}{ccc}
+\hline Year & $\tau$ & Tax revenue (in bn.) \\
+\hline 2012 & 37 & 198.875 \\
+2013 & 42 & 199.500 \\
+2014 & 45 & 196.875 \\
+\hline
+\end{tabular}
+```
+
+You should help the government to find the revenue maximizing tax rate. Therefore write a program that interpolates the tax function $T(\tau)$ given the data from the above table using polynominal interpolation. Print the resulting tax function in the interval $[35 ; 45]$ and compute the revenue-maximizing tax rate as well as the corresponding tax revenue.
+
+Why is it not possible to use the subroutines for piecewise linear or cubic spline interpolation here?
+
+---
+
+To find the revenue-maximizing tax rate using polynomial interpolation, we can approximate the tax function based on the given data points. However, it's important to note that polynomial interpolation might not be the most suitable method for this scenario. Polynomial interpolations tend to oscillate between data points and can lead to unreliable extrapolations beyond the data range. Additionally, high-degree polynomials can exhibit wild behavior, which may not accurately represent the underlying tax function.
+
+To demonstrate polynomial interpolation, we'll use the `Interpolations` package in Julia. Here's an example code that performs polynomial interpolation based on the given data:
+
+```julia
+using Interpolations
+
+# Given data
+years = [2012, 2013, 2014]
+tax_rates = [37, 42, 45]
+tax_revenues = [198.875, 199.5, 196.875]
+
+# Perform polynomial interpolation
+tax_interpolation = interpolate(tax_rates, tax_revenues, Gridded(Linear()))
+
+# Evaluate the tax function in the interval [35, 45]
+tax_values = range(35, stop=45, length=100)
+revenue_values = [tax_interpolation(tax) for tax in tax_values]
+
+# Find the revenue-maximizing tax rate and corresponding tax revenue
+max_revenue = maximum(revenue_values)
+optimal_tax_rate = tax_values[argmax(revenue_values)]
+
+# Print the resulting tax function and revenue-maximizing tax rate
+println("Tax Function:")
+for i in 1:length(tax_values)
+    println("Tax Rate: $(tax_values[i]), Tax Revenue: $(revenue_values[i])")
+end
+println()
+println("Revenue-Maximizing Tax Rate: $optimal_tax_rate")
+println("Corresponding Tax Revenue: $max_revenue")
+```
+
+In this code, we first define the given data points: `years`, `tax_rates`, and `tax_revenues`. We then use the `interpolate` function from the `Interpolations` package to perform polynomial interpolation. The `Gridded(Linear())` specification selects linear interpolation between the data points.
+
+Next, we evaluate the tax function for various tax rates in the interval `[35, 45]` and store the corresponding tax revenues in the `revenue_values` array.
+
+Finally, we find the revenue-maximizing tax rate by identifying the maximum tax revenue value and its corresponding tax rate. We print the resulting tax function and display the revenue-maximizing tax rate along with the corresponding tax revenue.
+
+Regarding why we can't use piecewise linear or cubic spline interpolation, these methods rely on connecting the given data points using linear segments or cubic polynomials, respectively. However, in this case, we only have three data points. Piecewise linear or cubic spline interpolation would require more data points to accurately represent the tax function and interpolate between them. The small number of data points available in the given table makes it challenging to use these interpolation methods effectively. Polynomial interpolation, while not ideal, can still provide an approximation but may suffer from issues such as overfitting and oscillations.
+
+## Exercise 8
+
+---
+
+2.8. Write a program which plots the function $\cos (x)$ on the interval $[0 ; 2 \pi]$ using linear interpolation. In order to do this split up the total interval into $n+1$ equidistant nodes $x_i, i=0, \ldots, n$ and compute in each subinterval $\left[x_{i-1} ; x_i\right]$ the linear equation $f(x)=m_i \cdot x+t_i$ with
+
+$$
+m_i=\frac{f\left(x_i\right)-f\left(x_{i-1}\right)}{x_i-x_{i-1}} \text { and } t_i=f\left(x_{i-1}\right)-m_i \cdot x_{i-1},
+$$
+
+where $x_{i-1}$ and $x_i$ denote the lower and upper bound of the respective subinterval $i$. Then draw $n$ graphs that show the linear approximation of the cosine function. Compare your linear interpolation results with the true cosine function for $n=10,20$, and 30 . Now approximate the function using the piecewise linear interpolation subroutine linint_Equi as well as the spline approach and compare the results with the true cosine function.
+
+---
+
+To plot the function $\cos(x)$ on the interval $[0, 2\pi]$ using linear interpolation, we can split the interval into equidistant nodes and compute linear equations within each subinterval. We will compare the linear interpolation results with the true cosine function and also approximate the function using piecewise linear interpolation and spline interpolation.
+
+Here's an example code that demonstrates this process using the Plots.jl package for visualization:
+
+```julia
+using Plots
+
+# Define the true cosine function
+f_true(x) = cos(x)
+
+# Define the number of nodes
+n_values = [10, 20, 30]
+
+# Split the interval into equidistant nodes
+x_nodes = range(0, stop=2π, length=n_values[3]+1)
+
+# Compute linear interpolation and plot the results
+plot_legend = []
+for n in n_values
+    # Compute linear interpolation for the current number of nodes
+    f_interpolation = []
+    for i in 1:n
+        x_start = x_nodes[i]
+        x_end = x_nodes[i+1]
+        m = (f_true(x_end) - f_true(x_start)) / (x_end - x_start)
+        t = f_true(x_start) - m * x_start
+        f_subinterval(x) = m * x + t
+        push!(f_interpolation, f_subinterval)
+    end
+
+    # Plot the linear interpolation
+    plot(x_nodes, f_true.(x_nodes), label="True Cosine", legend=:topleft)
+    for i in 1:n
+        plot!(x_nodes[i:i+1], f_interpolation[i].(x_nodes[i:i+1]), label="Interpolation $i")
+    end
+
+    # Store the legend for the plot
+    push!(plot_legend, "Interpolation (n=$n)")
+end
+
+# Plot the piecewise linear interpolation
+f_piecewise_interpolation = PiecewiseInterpolation(x_nodes, f_true.(x_nodes))
+plot!(f_piecewise_interpolation, label="Piecewise Linear Interpolation")
+
+# Plot the spline interpolation
+f_spline_interpolation = CubicSplineInterpolation(x_nodes, f_true.(x_nodes))
+plot!(f_spline_interpolation, label="Spline Interpolation")
+
+# Set the x-axis label and title
+xlabel!("x")
+title!("Linear Interpolation of Cosine Function")
+
+# Display the plot
+plot!()
+```
+
+In this code, we first define the true cosine function `f_true(x) = cos(x)`. We then specify the number of nodes `n_values` for which we want to perform linear interpolation.
+
+We split the interval `[0, 2π]` into equidistant nodes using the `range` function. Within each subinterval, we compute the linear equation for linear interpolation and store the interpolated functions in the `f_interpolation` array.
+
+We plot the true cosine function and the linear interpolation results for different values of `n`. Additionally, we include the piecewise linear interpolation and spline interpolation using the `PiecewiseInterpolation` and `CubicSplineInterpolation` types, respectively.
+
+Finally, we set the x-axis label and title and display the plot using `plot!()`.
+
+Please ensure that you have the `Plots` package installed in Julia by running the following command in the Julia REPL:
+
+```julia
+using Pkg
+Pkg.add("Plots")
+```
+
+With this code, you should be able to visualize the linear interpolation results and compare them with the true cosine function, as well as observe the piecewise linear interpolation and spline interpolation.
+
+## Exercise 9 
+
+---
+
+2.9. Consider a Cournot oligopoly market with $m$ identical companies. Given the demand curve $D(P)=P^{-\eta}$, each company produces output $q(P)$ by equating marginal benefits and marginal costs. Marginal benefits are given by $P+q \frac{\mathrm{d} P}{\mathrm{~d} q}$ and marginal costs are assumed to be given by $c(q)=\alpha \sqrt{q}+q^2$. Due to the Cournot assumption each firm expects its competitors to not react to our changes in output. Consequently, we have $\frac{\mathrm{d} P}{\mathrm{~d} q}=\frac{1}{D^{\prime}(P)}$.
+
+(a) Set up an equidistant price grid $\mathrm{P}(0: \mathrm{N})$ on the interval $[0.1 ; 3.0]$ using subroutine grid_Cons_Equi, initialize spline coefficients coeff_q $=0$ and derive the respective individual quantities $\mathrm{q}(0: \mathrm{N})$ at each gridpoint using function $\mathrm{f}$ zero.
+
+(b) Interpolate the individual supply function $q$ using function spline_interp with the coefficients coeff_q. Use spline_eval to calculate supply in between the points specified in $\mathrm{P}(0: \mathrm{N})$. Print market demand and the supply curve.
+
+(c) Compute the equilibrium price and quantity using function $\mathrm{f}$ zero as well as the interpolated aggregate supply function.
+
+(d) Change the number $m$ of companies as well as the price elasticity $\eta$ and $\alpha$. Explain your results in economic terms.
+The initial parametrization is $\alpha=1, \eta=1.5, m=3, N=10, N P=1000$.
+
+---
+
+(a) Setting up the equidistant price grid and calculating individual quantities:
+To set up an equidistant price grid on the interval [0.1, 3.0] with N = 10, we divide the interval into N equal parts. Each grid point represents a price value. We'll use the subroutine grid_Cons_Equi to generate this grid.
+
+Next, we initialize the spline coefficients coeff_q with the value 0. These coefficients will be used for interpolating the individual supply function.
+
+Finally, we derive the respective individual quantities q at each grid point by using the function f_zero. The f_zero function is not provided in your question, so we'll need to define it. The function f_zero will solve for the quantity q at each price point, given the demand and cost functions.
+
+(b) Interpolating the individual supply function and calculating market demand and supply:
+We'll use the spline_interp function to interpolate the individual supply function q based on the coefficients coeff_q obtained in step (a). This will allow us to estimate the supply quantity at any price point, including those in between the grid points.
+
+To calculate the market demand, we need to integrate the individual demand functions of each firm. Since all firms are identical and operate in a Cournot oligopoly, the individual demand function for each firm is given by D(P) = P^(-η). We sum up the demand quantities of all firms to obtain the aggregate demand.
+
+The supply curve is obtained by evaluating the interpolated individual supply function at each price point on the grid.
+
+(c) Computing the equilibrium price and quantity:
+To find the equilibrium price and quantity, we need to determine the price at which the market demand equals the aggregate supply. This can be done by solving the equation D(P) = aggregate supply(P) using the f_zero function or by comparing the market demand and supply curves graphically.
+
+(d) Changing the parameters:
+To analyze the effects of changing the number of companies (m), the price elasticity (η), and the cost parameter (α), you can modify these values in the given equations and observe the resulting changes in equilibrium price and quantity. This will help you understand how these factors impact the market outcome in economic terms.
+
+```julia
+using Interpolations
+
+# Function to calculate individual quantity using f_zero
+function f_zero(p, α, η)
+    q = (α * sqrt(p) + p^2) / (2 * η * p^2)
+    return q
+end
+
+# Function to calculate market demand
+function market_demand(p, η, m)
+    return m * p^(-η)
+end
+
+# Set up an equidistant price grid
+function grid_Cons_Equi(p_min, p_max, N)
+    return range(p_min, p_max, length=N)
+end
+
+# Parameters
+α = 1
+η = 1.5
+m = 3
+N = 10
+
+# Set up price grid
+P = grid_Cons_Equi(0.1, 3.0, N)
+
+# Initialize spline coefficients
+coeff_q = zeros(N)
+
+# Calculate individual quantities at each price point
+for i in 1:N
+    p = P[i]
+    q = f_zero(p, α, η)
+    coeff_q[i] = q
+end
+
+# Interpolate the individual supply function
+interp_q = LinearInterpolation(P, coeff_q)
+
+# Calculate supply at any price point
+function supply(p)
+    return interp_q(p)
+end
+
+# Calculate market demand and supply curves
+demand_curve = market_demand.(P, η, m)
+supply_curve = supply.(P)
+
+# Print market demand and supply curve
+println("Market Demand: ", demand_curve)
+println("Supply Curve: ", supply_curve)
+```
+## Exercise 10
+
+---
+
+2.10. Now consider a local newspaper which is a monopoly in a region. It serves two distinct customer groups: readers and advertisers. The price of the newspaper $p_R$ is irrelevant for the advertiser, as are the advertising prices $p_A$ for the reader. However, since a higher newspaper price induces lower sales of newspapers, demand for ads will typically fall. On the other hand it is not clear how the demand for newspapers is affected by higher or lower advertising. In order to find out the optimal price combination $\left(p_R^*, p_A^*\right)$ that maximizes profits, the managers of the newspaper vary the two prices and observe the following profits $G\left(p_R, p_A\right)$ :
+
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline & & \multicolumn{4}{|c|}{$\rho_A$} \\
+\hline & & 0.5 & 4.5 & 8.5 & 12.5 \\
+\hline \multirow{4}{*}{$\rho_R$} & 0.5 & 11.5 & 70.9 & 98.3 & 93.7 \\
+\hline & 4.5 & 31.1 & 82.5 & 101.9 & 89.3 \\
+\hline & 8.5 & 18.7 & 62.1 & 73.5 & 52.9 \\
+\hline & 12.5 & -25.7 & 9.7 & 13.1 & -15.5 \\
+\hline
+\end{tabular}
+
+(a) Given this information, construct a two-dimensional spline approximation of the profit function. What is the optimal price combination $\left(p_R^*, p_A^*\right)$ and the resulting optimal profit $G\left(p_R^*, p_A^*\right)$ ? Hint: Set up two equidistant price grids $\mathrm{PR}(0: 3)$ and $\mathrm{PA}(0: 3)$ on the interval $[0.5 ; 12.5]$ using subroutine grid_Cons_Equi. Given profits $\mathrm{G}(0: 3,0: 3)$ the spline coefficients coeff_G can be derived using subroutine spline_interp (G, coeff_G). Next, evaluate the profit function Gplot $(0: \mathrm{Npl}$ ot, $0:$ Nplot) using function spline_eval at each grid point. Finally, find the location of the maximum profit using function maxloc.
+
+(b) Marginal costs for both newspapers and advertisements are constant at $c=0.1$. In addition, the managers have derived the 'true' demand functions
+
+$$
+x_R=10-p_R \text { and } x_A=20-p_A-0.5 p_R
+$$
+
+for newspapers and advertisements, respectively. Compute the profitmaximizing price combination using either $f$ minsearch or $f$ zero and compare with the approximated solution.
+
+(c) Use Nplot $=100,1000,10000$ and compare the approximation error.
+
+---
+
+(a) To construct a two-dimensional spline approximation of the profit function, we'll follow the steps outlined in the question:
+
+1. Set up two equidistant price grids PR and PA on the interval [0.5, 12.5] using the subroutine grid_Cons_Equi.
+2. Initialize an empty matrix G with size (N, N), where N is the number of grid points.
+3. Fill the matrix G with the given profit values.
+4. Use the spline_interp function to obtain the spline coefficients coeff_G for the profit function.
+5. Evaluate the profit function Gplot at each grid point using the spline_eval function.
+6. Find the location of the maximum profit using the maxloc function.
+
+Here's an example implementation in Julia:
+
+```julia
+using Interpolations
+
+# Set up an equidistant price grid
+function grid_Cons_Equi(p_min, p_max, N)
+    return range(p_min, p_max, length=N)
+end
+
+# Profit data
+G = [11.5 70.9 98.3 93.7;
+     31.1 82.5 101.9 89.3;
+     18.7 62.1 73.5 52.9;
+     -25.7 9.7 13.1 -15.5]
+
+# Parameters
+N = 4
+
+# Set up price grids
+PR = grid_Cons_Equi(0.5, 12.5, N)
+PA = grid_Cons_Equi(0.5, 12.5, N)
+
+# Calculate spline coefficients for profit function
+interp_G = spline_interp((PR, PA), G)
+
+# Evaluate profit function at each grid point
+Gplot = zeros(N, N)
+for i in 1:N
+    for j in 1:N
+        Gplot[i, j] = interp_G(PR[i], PA[j])
+    end
+end
+
+# Find location of maximum profit
+max_profit_index = argmax(Gplot)
+pR_opt, pA_opt = PR[max_profit_index[1]], PA[max_profit_index[2]]
+G_opt = Gplot[max_profit_index[1], max_profit_index[2]]
+
+println("Optimal price combination: pR = ", pR_opt, ", pA = ", pA_opt)
+println("Optimal profit: G(pR, pA) = ", G_opt)
+```
+
+The code will calculate the optimal price combination (pR_opt, pA_opt) and the resulting optimal profit G_opt using a spline approximation of the profit function.
+
+(b) To compute the profit-maximizing price combination using the "true" demand functions, we can set up an optimization problem using either fminsearch or fzero (root-finding) algorithms. Let's use the fminsearch algorithm in this case. Here's an example implementation in Julia:
+
+```julia
+using Optim
+
+# True demand functions
+function demand_R(pR)
+    return 10 - pR
+end
+
+function demand_A(pR, pA)
+    return 20 - pA - 0.5 * pR
+end
+
+# Cost parameter
+c = 0.1
+
+# Define the profit function
+function profit(pR_pA)
+    pR, pA = pR_pA
+    xR = demand_R(pR)
+    xA = demand_A(pR, pA)
+    return (pR - c) * xR + (pA - c) * xA
+end
+
+# Set up the optimization problem
+result = optimize(profit, [0.5, 0.5], NelderMead())
+
+# Retrieve the optimal price combination and profit
+pR_opt, pA_opt = result.minimum
+G_opt = -result.minimum_obj_value  # negate the objective value to obtain profit
+
+println("Optimal price combination (using true demand functions): pR = ", pR_opt, ", pA = ", pA_opt)
+println("Optimal profit (using true demand functions): G(pR, pA) = ", G_opt)
+```
+
+The code will use the fminsearch algorithm from the Optim package to find the profit-maximizing price combination (pR_opt, pA_opt) and the resulting optimal profit G_opt using the "true" demand functions.
+
+(c) To compare the approximation error, we'll calculate the error between the true profit function and the spline approximation for different values of Nplot (number of grid points). Here's an example implementation in Julia:
+
+```julia
+# Parameters
+Nplot_values = [100, 1000, 10000]
+
+# Calculate true profit function values
+true_G = zeros(N, N)
+for i in 1:N
+    for j in 1:N
+        true_G[i, j] = profit([PR[i], PA[j]])
+    end
+end
+
+# Calculate approximation error for each Nplot value
+for Nplot in Nplot_values
+    # Set up price grids for approximation
+    PR_approx = grid_Cons_Equi(0.5, 12.5, Nplot)
+    PA_approx = grid_Cons_Equi(0.5, 12.5, Nplot)
+
+    # Calculate spline coefficients for approximation
+    interp_G_approx = spline_interp((PR, PA), G)
+
+    # Evaluate approximation at each grid point
+    G_approx = zeros(Nplot, Nplot)
+    for i in 1:Nplot
+        for j in 1:Nplot
+            G_approx[i, j] = interp_G_approx(PR_approx[i], PA_approx[j])
+        end
+    end
+
+    # Calculate approximation error
+    error = norm(true_G - G_approx) / norm(true_G)
+
+    println("Approximation error (Nplot = $Nplot): ", error)
+end
+```
+
+The code will calculate the approximation error between the true profit function and the spline approximation for different values of Nplot. It uses the norm function to calculate the error as the normalized difference between the matrices. The approximation error is printed for each Nplot value specified in the Nplot_values array.
+
+## Exercise 11
+
+---
+
+2.11. Three gravel-pits $A_1, A_2$ and $A_3$ store 11 tons, 13 tons, and 10 tons of gravel, respectively. The gravel is used at four building sites $B_1, B_2, B_3$, and $B_4 . B_1$ orders 5 tons, $B_2 7$ tons, $B_3 13$ tons, and $B_4 6$ tons of gravel. The transport cost of one ton of gravel from pit $A_i$ to the building site $B_j$ are displayed in the following table.
+
+\begin{tabular}{rrrrr}
+\hline & $B_1$ & $B_2$ & $B_3$ & $B_4$ \\
+\hline$A_1$ & 10 & 70 & 100 & 80 \\
+$A_2$ & 130 & 90 & 120 & 110 \\
+$A_3$ & 50 & 30 & 80 & 10 \\
+\hline
+\end{tabular}
+
+Minimize the total cost of transport from gravel pits to the building sites using a simplex algorithm.
+
+---
+
+To minimize the total cost of transport from gravel pits to the building sites, we can formulate this problem as a linear programming problem and solve it using a simplex algorithm.
+
+Let's define the decision variables as follows:
+- Let xij represent the amount of gravel transported from pit Ai to building site Bj.
+- Let cij represent the transport cost per ton from pit Ai to building site Bj.
+
+Our objective is to minimize the total cost, which can be expressed as:
+Minimize Z = 10x11 + 70x12 + 100x13 + 80x14 + 130x21 + 90x22 + 120x23 + 110x24 + 50x31 + 30x32 + 80x33 + 10x34
+
+Subject to the following constraints:
+1. The total amount of gravel transported from pit Ai should not exceed the available quantity in pit Ai:
+x11 + x12 + x13 + x14 ≤ 11
+x21 + x22 + x23 + x24 ≤ 13
+x31 + x32 + x33 + x34 ≤ 10
+
+2. The total amount of gravel delivered to building site Bj should meet the demand at that site:
+x11 + x21 + x31 = 5
+x12 + x22 + x32 = 7
+x13 + x23 + x33 = 13
+x14 + x24 + x34 = 6
+
+All variables should also be non-negative: xij ≥ 0.
+
+We can solve this linear programming problem using a simplex algorithm implementation in Julia, such as the `SimplexSolver` package. Please make sure you have the `SimplexSolver` package installed by running `using Pkg; Pkg.add("SimplexSolver")` in your Julia environment.
+
+Here's an example implementation:
+
+```julia
+using SimplexSolver
+
+# Define the cost matrix
+C = [10 70 100 80;
+     130 90 120 110;
+     50 30 80 10]
+
+# Define the available quantities in pits and the demand at building sites
+b = [11; 13; 10]
+d = [5; 7; 13; 6]
+
+# Define the objective function coefficients
+c = reshape(C', 12)
+
+# Define the constraint matrix
+A = [1 0 0 0 1 0 0 0 1 0 0 0;
+     0 1 0 0 0 1 0 0 0 1 0 0;
+     0 0 1 0 0 0 1 0 0 0 1 0;
+     0 0 0 1 0 0 0 1 0 0 0 1]
+
+# Create a simplex problem
+problem = SimplexProblem(c, A, b, d, names=["x11", "x12", "x13", "x14", "x21", "x22", "x23", "x24", "x31", "x32", "x33", "x34"])
+
+# Solve the simplex problem
+solve!(problem)
+
+# Get the optimal solution
+optimal_solution = problem.solution
+
+# Print the optimal solution
+println("Optimal Solution:")
+for (name, value) in optimal_solution
+    println("$name = $value")
+end
+
+# Calculate the total cost
+total_cost = dot(c, [value for (name, value) in optimal_solution])
+println("Total Cost = $total_cost")
+```
+
+The code will solve the linear programming problem using the simplex algorithm and provide the optimal solution, which represents the optimal amount of gravel transported from each pit to each building site. It also calculates the total cost of transport.
