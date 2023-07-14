@@ -675,3 +675,69 @@ Please note that the provided code assumes that you have the required packages (
 
 ---
 
+2.3. Write a program which computes the global minimum of the function $f(x)=x \cos \left(x^2\right)$ on the interval $[0,5]$ using Golden Search. Proceed using the following steps:
+
+(a) Write a function minimize (a, b) of type real*8, which computes the local minimum of $f(x)$ using Golden Search on the interval $[a, b]$.
+
+(b) Next split up the interval $[0,5]$ in n subintervals $\left[x_i, x_{i+1}\right]$ of identical length and compute for each interval the local minimum using the function minimize.
+
+(c) Finally, your program has to sort out the global minimum from the set of computed local minima using the function minloc (array, 1).
+
+Test your program with different values for $n$. How many subintervals are necessary to find the global minimum?
+
+---
+
+```julia
+using Optim
+
+# Define the function f(x)
+function f(x)
+    return x * cos(x^2)
+end
+
+# Define the minimize function using Golden Section Search
+function minimize(a, b)
+    result = optimize(f, a, b)
+    return Optim.minimizer(result)
+end
+
+# Split the interval [0, 5] into n subintervals and find local minima
+function find_global_minimum(n)
+    intervals = range(0, stop=5, length=n+1)
+    local_minima = []
+
+    for i in 1:n
+        a = intervals[i]
+        b = intervals[i+1]
+        local_min = minimize(a, b)
+        push!(local_minima, local_min)
+    end
+
+    global_min_index = argmin(local_minima)
+    global_min = local_minima[global_min_index]
+
+    return global_min
+end
+
+# Test the program with different values for n
+n_values = [10, 20, 50, 100]
+for n in n_values
+    global_min = find_global_minimum(n)
+    println("Number of Subintervals: $n, Global Minimum: $global_min")
+end
+```
+
+This code snippet demonstrates the use of the Optim package in Julia to find the global minimum of a function using the Golden Section Search method. Here's a breakdown of the code:
+
+1. The code defines a function `f(x)` that represents the objective function to be minimized. In this case, the function is `f(x) = x * cos(x^2)`.
+
+2. Another function `minimize(a, b)` is defined, which takes two parameters `a` and `b` representing the interval boundaries. It uses the `optimize` function from the Optim package to find the minimum of the function `f(x)` within the given interval `[a, b]`. The `Optim.minimizer` function extracts the minimizer from the optimization result.
+
+3. The `find_global_minimum(n)` function is defined to find the global minimum of the function `f(x)` by splitting the interval `[0, 5]` into `n` subintervals. It creates a range of `n+1` equally spaced values between 0 and 5 using the `range` function. It then iterates over these subintervals, calling the `minimize` function for each subinterval and stores the local minima in the `local_minima` array.
+
+4. After finding all the local minima, the code identifies the index of the minimum value in the `local_minima` array using `argmin`. It retrieves the global minimum value based on the index.
+
+5. Finally, the code tests the `find_global_minimum` function by calling it with different values of `n` and prints the number of subintervals and the corresponding global minimum.
+
+In summary, the code divides the interval `[0, 5]` into smaller subintervals and finds the local minimum in each subinterval using the Golden Section Search method. It then identifies the global minimum among these local minima and prints the results for different values of `n`.
+
