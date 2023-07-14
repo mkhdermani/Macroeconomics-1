@@ -846,8 +846,7 @@ Remember that these interpretations are based on the assumptions made in the int
 Test your program in the interval $[a ; b]=[-1,1]$ with $n=10,20$, and 30 nodes and compare the results with the analytical calculation. What are the differences?
 
 ---
-
-To approximate the integral using the trapezoid rule, Simpson's rule, and Gauss-Legendre quadrature method, we can utilize the `QuadGK` package in Julia. Here's an example program that performs these approximations for two different functions and compares the results with the analytical calculations:
+To approximate the integral using the trapezoid rule, Simpson's rule, and Gauss-Legendre quadrature method in Julia, you can use the `QuadGK` package for numerical integration. Here's an example code that utilizes this package:
 
 ```julia
 using QuadGK
@@ -866,11 +865,8 @@ analytical_integral_f2(a, b) = (2/3) * (abs(b)^(3/2) - abs(a)^(3/2))
 function trapezoid_rule_approximation(f, a, b, n)
     x = range(a, stop=b, length=n+1)
     h = (b - a) / n
-    integral_sum = (f(a) + f(b)) / 2
-    for i = 2:n
-        integral_sum += f(x[i])
-    end
-    approximation = h * integral_sum
+    integral_sum = sum(f.(x[1:end-1]) .+ f.(x[2:end]))
+    approximation = (h / 2) * integral_sum
     return approximation
 end
 
@@ -892,7 +888,7 @@ end
 
 # Perform approximation using Gauss-Legendre quadrature
 function gauss_legendre_quadrature_approximation(f, a, b, n)
-    approximation, _ = quadgk(f, a, b, n=n)
+    approximation, _ = quadgk(f, a, b, atol=0, rtol=1e-12, maxevals=n)
     return approximation
 end
 
@@ -932,15 +928,11 @@ for n in n_values
 end
 ```
 
-Make sure you have the `QuadGK` package installed in Julia before running this program. You can do so by running the following command in the Julia REPL:
+Make sure you have the `QuadGK` package installed in Julia before running this code. You can do so by running the following command in the Julia REPL:
 
 ```julia
 using Pkg
 Pkg.add("QuadGK")
 ```
 
-The program defines the functions `f1` and `f2` representing the given functions. It also defines analytical solutions `analytical_integral_f1` and `analytical_integral_f2` for calculating the integrals analytically.
-
-The program then implements the trapezoid rule approximation `trapezoid_rule_approximation`, Simpson's rule approximation `simpson_rule_approximation`, and Gauss-Legendre quadrature approximation `gauss_legendre_quadrature_approximation`.
-
-Finally, it performs the approximations for different values of `n` and compares the results with the analytical solutions for both functions `f(x) = exp(-x)` and `f(x) = |x|^0.5`. The results are printed for each approximation method and each value of `n`.
+With this package, the trapezoid rule, Simpson's rule, and Gauss-Legendre quadrature are implemented. The code then performs the approximations for different values of `n` and compares the results with the analytical solutions for both `f(x) = exp(-x)` and `f(x) = |x|^0.5`.
