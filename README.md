@@ -1290,7 +1290,7 @@ println("Supply Curve: ", supply_curve)
 
 ---
 
-2.10. Now consider a local newspaper which is a monopoly in a region. It serves two distinct customer groups: readers and advertisers. The price of the newspaper $p_R$ is irrelevant for the advertiser, as are the advertising prices $p_A$ for the reader. However, since a higher newspaper price induces lower sales of newspapers, demand for ads will typically fall. On the other hand it is not clear how the demand for newspapers is affected by higher or lower advertising. In order to find out the optimal price combination $\left(p_R^*, p_A^*\right)$ that maximizes profits, the managers of the newspaper vary the two prices and observe the following profits $G\left(p_R, p_A\right)$ :
+2.10. Now consider a local newspaper which is a monopoly in a region. It serves two distinct customer groups: readers and advertisers. The price of the newspaper $p_R$ is irrelevant for the advertiser, as are the advertising prices $p_A$ for the reader. However, since a higher newspaper price induces lower sales of newspapers, demand for ads will typically fall. On the other hand, it is not clear how the demand for newspapers is affected by higher or lower advertising. In order to find out the optimal price combination $(p_R^*, p_A^*)$ that maximizes profits, the managers of the newspaper vary the two prices and observe the following profits $G(p_R, p_A)$:
 
 |       |       | ρₐ=0.5 | ρₐ=4.5 | ρₐ=8.5 | ρₐ=12.5 |
 |-------|-------|--------|--------|--------|---------|
