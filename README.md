@@ -835,3 +835,112 @@ To analyze the economic implications of changing the interest rate (r) and wage 
 - When you alter the time discount rate (β), a higher β places more weight on future consumption relative to present consumption. As a result, the optimal consumption levels may decrease in the current period and increase in future periods.
 
 Remember that these interpretations are based on the assumptions made in the intertemporal household optimization problem. Real-world implications may be more complex and dependent on specific economic conditions and assumptions.
+
+## Exercise 5
+
+---
+
+2.5. Write a program which approximates the integral of $\int_a^b f(x) \mathrm{d} x$ using the trapezoid rule, the Simpson rule, and the Gauss-Legendre quadrature method.
+(a) Assume $f(x)=\exp (-x)$.
+(b) Now assume $f(x)=|x|^{0.5}$.
+Test your program in the interval $[a ; b]=[-1,1]$ with $n=10,20$, and 30 nodes and compare the results with the analytical calculation. What are the differences?
+
+---
+
+To approximate the integral using the trapezoid rule, Simpson's rule, and Gauss-Legendre quadrature method, we can utilize the `QuadGK` package in Julia. Here's an example program that performs these approximations for two different functions and compares the results with the analytical calculations:
+
+```julia
+using QuadGK
+
+# Function f(x) = exp(-x)
+f1(x) = exp(-x)
+
+# Function f(x) = |x|^0.5
+f2(x) = abs(x)^0.5
+
+# Analytical solution for the integral of f(x) in [a, b]
+analytical_integral_f1(a, b) = exp(-a) - exp(-b)
+analytical_integral_f2(a, b) = (2/3) * (abs(b)^(3/2) - abs(a)^(3/2))
+
+# Perform approximation using the trapezoid rule
+function trapezoid_rule_approximation(f, a, b, n)
+    x = range(a, stop=b, length=n+1)
+    h = (b - a) / n
+    integral_sum = (f(a) + f(b)) / 2
+    for i = 2:n
+        integral_sum += f(x[i])
+    end
+    approximation = h * integral_sum
+    return approximation
+end
+
+# Perform approximation using Simpson's rule
+function simpson_rule_approximation(f, a, b, n)
+    x = range(a, stop=b, length=n+1)
+    h = (b - a) / n
+    integral_sum = f(a) + f(b)
+    for i = 2:n
+        if i % 2 == 0
+            integral_sum += 2 * f(x[i])
+        else
+            integral_sum += 4 * f(x[i])
+        end
+    end
+    approximation = (h / 3) * integral_sum
+    return approximation
+end
+
+# Perform approximation using Gauss-Legendre quadrature
+function gauss_legendre_quadrature_approximation(f, a, b, n)
+    approximation, _ = quadgk(f, a, b, n=n)
+    return approximation
+end
+
+# Interval [a, b] and number of nodes n
+a = -1
+b = 1
+n_values = [10, 20, 30]
+
+# Approximate and compare results for f(x) = exp(-x)
+println("Approximation for f(x) = exp(-x)")
+for n in n_values
+    trapezoid_result = trapezoid_rule_approximation(f1, a, b, n)
+    simpson_result = simpson_rule_approximation(f1, a, b, n)
+    gauss_legendre_result = gauss_legendre_quadrature_approximation(f1, a, b, n)
+    analytical_result = analytical_integral_f1(a, b)
+    println("n = $n")
+    println("Trapezoid Rule: $trapezoid_result")
+    println("Simpson's Rule: $simpson_result")
+    println("Gauss-Legendre Quadrature: $gauss_legendre_result")
+    println("Analytical Result: $analytical_result")
+    println()
+end
+
+# Approximate and compare results for f(x) = |x|^0.5
+println("Approximation for f(x) = |x|^0.5")
+for n in n_values
+    trapezoid_result = trapezoid_rule_approximation(f2, a, b, n)
+    simpson_result = simpson_rule_approximation(f2, a, b, n)
+    gauss_legendre_result = gauss_legendre_quadrature_approximation(f2, a, b, n)
+    analytical_result = analytical_integral_f2(a, b)
+    println("n = $n")
+    println("Trapezoid Rule: $trapezoid_result")
+    println("Simpson's Rule: $simpson_result")
+    println("Gauss-Legendre Quadrature: $gauss_legendre_result")
+    println("Analytical Result: $analytical_result")
+    println()
+end
+```
+
+Make sure you have the `QuadGK` package installed in Julia before running this program. You can do so by running the following command in the Julia REPL:
+
+```julia
+using Pkg
+Pkg.add("QuadGK")
+```
+
+The program defines the functions `f1` and `f2` representing the given functions. It also defines analytical solutions `analytical_integral_f1` and `analytical_integral_f2` for calculating the integrals analytically.
+
+The program then implements the trapezoid rule approximation `trapezoid_rule_approximation`, Simpson's rule approximation `simpson_rule_approximation`, and Gauss-Legendre quadrature approximation `gauss_legendre_quadrature_approximation`.
+
+Finally, it performs the approximations for different values of `n` and compares the results with the analytical solutions for both functions `f(x) = exp(-x)` and `f(x) = |x|^0.5`. The results are printed for each approximation method and each value of `n`.
