@@ -1488,49 +1488,78 @@ x14 + x24 + x34 = 6
 
 All variables should also be non-negative: xij ≥ 0.
 
-We can solve this linear programming problem using a simplex algorithm implementation in Julia, such as the `SimplexSolver` package. Please make sure you have the `SimplexSolver` package installed by running `using Pkg; Pkg.add("SimplexSolver")` in your Julia environment.
-
-Here's an example implementation:
-
+1. Importing the necessary packages:
 ```julia
-using SimplexSolver
+using JuMP
+using GLPK
+```
+We import the JuMP package for modeling the linear programming problem and the GLPK package for solving it with the GLPK solver.
 
-# Define the cost matrix
+2. Defining the cost matrix, available quantities, and demand:
+```julia
 C = [10 70 100 80;
      130 90 120 110;
      50 30 80 10]
 
-# Define the available quantities in pits and the demand at building sites
 b = [11; 13; 10]
 d = [5; 7; 13; 6]
-
-# Define the objective function coefficients
-c = reshape(C', 12)
-
-# Define the constraint matrix
-A = [1 0 0 0 1 0 0 0 1 0 0 0;
-     0 1 0 0 0 1 0 0 0 1 0 0;
-     0 0 1 0 0 0 1 0 0 0 1 0;
-     0 0 0 1 0 0 0 1 0 0 0 1]
-
-# Create a simplex problem
-problem = SimplexProblem(c, A, b, d, names=["x11", "x12", "x13", "x14", "x21", "x22", "x23", "x24", "x31", "x32", "x33", "x34"])
-
-# Solve the simplex problem
-solve!(problem)
-
-# Get the optimal solution
-optimal_solution = problem.solution
-
-# Print the optimal solution
-println("Optimal Solution:")
-for (name, value) in optimal_solution
-    println("$name = $value")
-end
-
-# Calculate the total cost
-total_cost = dot(c, [value for (name, value) in optimal_solution])
-println("Total Cost = $total_cost")
 ```
+We define the cost matrix `C`, where each entry represents the cost of transporting one ton of gravel from a specific pit to a building site. `b` represents the available quantities of gravel in each pit, and `d` represents the demand at each building site.
 
-The code will solve the linear programming problem using the simplex algorithm and provide the optimal solution, which represents the optimal amount of gravel transported from each pit to each building site. It also calculates the total cost of transport.
+3. Creating the JuMP model and specifying the solver:
+```julia
+model = Model(optimizer_with_attributes(GLPK.Optimizer, "msg_lev" => 0))
+```
+We create a JuMP model and specify the GLPK solver as the optimizer for solving the linear programming problem. The `"msg_lev" => 0` attribute is used to suppress solver messages.
+
+4. Defining decision variables:
+```julia
+@variable(model, x[1:3, 1:4] >= 0)
+```
+We define the decision variables `x[i, j]`, representing the amount of gravel transported from pit `i` to building site `j`. The `@variable` macro is used to create the variables, and the `>= 0` constraint ensures non-negativity.
+
+5. Defining the objective function:
+```julia
+@objective(model, Min, sum(C[i, j] * x[i, j] for i in 1:3, j in 1:4))
+```
+We define the objective function to minimize the total cost of transportation. It sums the products of the cost matrix entries `C[i, j]` and the corresponding decision variables `x[i, j]`.
+
+6. Adding constraints:
+```julia
+@constraint(model, sum(x[i, 1] for i in 1:3) == d[1])
+@constraint(model, sum(x[i, 2] for i in 1:3) == d[2])
+@constraint(model, sum(x[i, 3] for i in 1:3) == d[3])
+@constraint(model, sum(x[i, 4] for i in 1:3) == d[4])
+for i in 1:3
+    @constraint(model, sum(x[i, j] for j in 1:4) <= b[i])
+end
+```
+We add constraints to ensure that the total transported amount from each pit matches the demand at each building site and does not exceed the available quantities in each pit. The `@constraint` macro is used to define these constraints.
+
+7. Solving the linear programming problem:
+```julia
+optimize!(model)
+```
+We solve the linear programming problem using the `optimize!` function, which invokes the GLPK solver to find the optimal solution.
+
+8. Retrieving the optimal solution and printing the results:
+```julia
+if termination_status(model) == MOI.OPTIMAL
+    optimal_solution = value.(x)
+    println("Optimal Solution:")
+    for i in 1:3
+        for j in 1:4
+            println("x$i$j = ", optimal_solution[i, j])
+        end
+    end
+    total_cost = objective_value(model)
+    println("Total Cost = ", total_cost)
+else
+    println("The problem could not be solved.")
+end
+```
+We check if the problem was successfully solved by examining the termination status. If it is optimal, we retrieve the optimal solution (the amounts of gravel transported) and print the results. The `value.(x)` function retrieves the optimal values of the decision variables. Finally, we calculate and print the total cost of transportation.
+
+This code sets up the linear programming problem to minimize the total cost of transporting gravel from pits to building sites and obtains the optimal solution using the GLPK solver through the JuMP modeling interface.
+
+Let me know if you have any further questions!
