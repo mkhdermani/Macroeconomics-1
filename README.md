@@ -1300,17 +1300,17 @@ println("Supply Curve: ", supply_curve)
 |       | ρᵣ=12.5| -25.7  | 9.7    | 13.1   | -15.5   |
 
 
-(a) Given this information, construct a two-dimensional spline approximation of the profit function. What is the optimal price combination $\left(p_R^*, p_A^*\right)$ and the resulting optimal profit $G\left(p_R^*, p_A^*\right)$ ? Hint: Set up two equidistant price grids $\mathrm{PR}(0: 3)$ and $\mathrm{PA}(0: 3)$ on the interval $[0.5 ; 12.5]$ using subroutine grid_Cons_Equi. Given profits $\mathrm{G}(0: 3,0: 3)$ the spline coefficients coeff_G can be derived using subroutine spline_interp (G, coeff_G). Next, evaluate the profit function Gplot $(0: \mathrm{Npl}$ ot, $0:$ Nplot) using function spline_eval at each grid point. Finally, find the location of the maximum profit using function maxloc.
+**(a)** Given this information, construct a two-dimensional spline approximation of the profit function. What is the optimal price combination $\left(p_R^*, p_A^*\right)$ and the resulting optimal profit $G\left(p_R^*, p_A^*\right)$? Hint: Set up two equidistant price grids $\mathrm{PR}(0: 3)$ and $\mathrm{PA}(0: 3)$ on the interval $[0.5 ; 12.5]$ using subroutine grid_Cons_Equi. Given profits $\mathrm{G}(0: 3,0: 3)$, the spline coefficients $\text{coeff}_G$ can be derived using subroutine spline_interp $(G, \text{coeff}_G)$. Next, evaluate the profit function $\text{Gplot}(0: \text{Npl} \text{ ot}, 0: \text{Nplot})$ using function spline_eval at each grid point. Finally, find the location of the maximum profit using function maxloc.
 
-(b) Marginal costs for both newspapers and advertisements are constant at $c=0.1$. In addition, the managers have derived the 'true' demand functions
+**(b)** Marginal costs for both newspapers and advertisements are constant at $c=0.1$. In addition, the managers have derived the 'true' demand functions:
 
 $$
-x_R=10-p_R \text { and } x_A=20-p_A-0.5 p_R
+x_R=10-p_R \text{ and } x_A=20-p_A-0.5 p_R
 $$
 
-for newspapers and advertisements, respectively. Compute the profitmaximizing price combination using either $f$ minsearch or $f$ zero and compare with the approximated solution.
+for newspapers and advertisements, respectively. Compute the profit-maximizing price combination using either $f$ minsearch or $f$ zero and compare with the approximated solution.
 
-(c) Use Nplot $=100,1000,10000$ and compare the approximation error.
+**(c)** Use $\text{Nplot} = 100, 1000, 10000$ and compare the approximation error.
 
 ---
 
