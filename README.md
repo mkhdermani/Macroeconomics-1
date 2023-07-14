@@ -741,3 +741,97 @@ This code snippet demonstrates the use of the Optim package in Julia to find the
 
 In summary, the code divides the interval `[0, 5]` into smaller subintervals and finds the local minimum in each subinterval using the Golden Section Search method. It then identifies the global minimum among these local minima and prints the results for different values of `n`.
 
+## Excersie 4
+
+---
+
+2.4. Consider the following intertemporal household optimization problem: The utility function of the household is given by
+
+$$
+U\left(c_1, c_2, c_3\right)=\sum_{i=1}^3 \beta^{i-1} u\left(c_i\right) \quad \text { with } \quad u\left(c_i\right)=\frac{c_i^{1-\frac{1}{\gamma}}}{1-\frac{1}{\gamma}},
+$$
+
+where $c_i$ defines consumption in period $i$ of life and $\beta$ denotes the time discount rate. Assume that the household receives labour income $w$ in the first two periods and consumes all savings in the third period, so that the budget constraint reads
+
+$$
+\sum_{i=1}^3 \frac{c_i}{(1+r)^{i-1}}=\sum_{i=1}^2 \frac{w}{(1+r)^{i-1}},
+$$
+
+where $r$ defines the interest rate.
+
+Solve for the optimal consumption levels using the subroutine optimize from the toolbox. Proceed using the following steps:
+
+(a) Substitute the budget constraint in the utility function so that it depends only on $c_2$ and $c_3$.
+
+(b) Minimize the function $-\widetilde{U}\left(c_2, c_3\right)$ in order to get the values $c_2^*$ and $c_3^*$.
+
+(c) Finally, derive $c_1^*$ from the budget constraint.
+
+Use the same parameter values as in Exercise 2 to test your program. Then increase the interest rate and the wage rate separately. Explain your results in economic terms. What will happen when wages are different in both periods? What happens when you alter $\beta$ ?
+
+---
+
+To solve the intertemporal household optimization problem described, we can follow the steps provided:
+
+(a) Substitute the budget constraint in the utility function so that it depends only on c₂ and c₃:
+
+The budget constraint can be rewritten as:
+
+c₁/(1+r)^0 + c₂/(1+r)^1 + c₃/(1+r)^2 = w/(1+r)^0 + w/(1+r)^1
+
+Substituting this in the utility function, we get:
+
+U(c₂, c₃) = β^0 * u(c₂) + β^1 * u(c₃) = β^0 * u(c₂) + β^1 * u((w - c₁/(1+r)^0 - c₂/(1+r)^1)/(1+r)^1)
+
+(b) Minimize the function -U(c₂, c₃) to get the values c₂* and c₃*:
+
+To minimize the function, we can define a new function that returns the negative of the utility function:
+
+```julia
+using Optim
+
+function negative_utility(x, β, γ, w, r)
+    c₂ = x[1]
+    c₃ = x[2]
+    c₁ = (w - c₂ - c₃/(1+r))/(1+r)
+    u_c₂ = c₂^(1-1/γ)/(1-1/γ)
+    u_c₃ = c₃^(1-1/γ)/(1-1/γ)
+    U = β^0 * u_c₂ + β^1 * u_c₃
+    return -U
+end
+
+β = 0.95  # Time discount rate
+γ = 2.0   # Coefficient of relative risk aversion
+w = 1.0   # Labor income
+r = 0.05  # Interest rate
+
+# Initial guess for c₂ and c₃
+x0 = [0.5, 0.5]
+
+# Use the optimize function to minimize the negative utility
+result = optimize(x -> negative_utility(x, β, γ, w, r), x0)
+
+# Extract the optimal values
+c₂_opt = result.minimizer[1]
+c₃_opt = result.minimizer[2]
+```
+
+(c) Derive c₁* from the budget constraint:
+
+Using the budget constraint, we can solve for c₁:
+
+c₁* = (w - c₂* - c₃*/(1+r))/(1+r)
+
+```julia
+c₁_opt = (w - c₂_opt - c₃_opt/(1+r))/(1+r)
+```
+
+Now we have the optimal consumption levels c₁*, c₂*, and c₃*.
+
+To analyze the economic implications of changing the interest rate (r) and wage rate (w), you can vary these parameters and observe the resulting changes in the optimal consumption levels. Here are some insights:
+
+- When the wage rates are different in both periods (w₁ ≠ w₂), the budget constraint will change accordingly, and the optimal consumption levels will adjust to balance the trade-off between current and future consumption. Higher wages in one period may lead to higher consumption in that period compared to the other.
+
+- When you alter the time discount rate (β), a higher β places more weight on future consumption relative to present consumption. As a result, the optimal consumption levels may decrease in the current period and increase in future periods.
+
+Remember that these interpretations are based on the assumptions made in the intertemporal household optimization problem. Real-world implications may be more complex and dependent on specific economic conditions and assumptions.
