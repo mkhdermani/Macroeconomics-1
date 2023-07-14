@@ -393,3 +393,157 @@ We then check the status of the solution using `termination_status(model)`. If t
 Finally, we print the optimal production quantities of goods 1 and 2 using `println`. If the solver does not find an optimal solution, we print a message indicating that no optimal solution was found.
 
 Make sure you have the JuMP and GLPK packages installed and imported. If you encounter any errors, ensure that you have the latest versions of the packages by running `using Pkg; Pkg.update()`.
+
+## Exercise 1
+
+---
+
+2.9 Exercises
+2.1. Consider the matrix
+$$
+A=\left[\begin{array}{cccc}
+1 & 5 & 2 & 3 \\
+1 & 6 & 8 & 6 \\
+1 & 6 & 11 & 2 \\
+1 & 7 & 17 & 4
+\end{array}\right]
+$$
+(a) Compute the matrices $L$ and $U$ applying the Gaussian elimination method by hand. Check your results using the subroutine $l_{-} \operatorname{dec}(A, L, U)$ from the toolbox. Finally, inspect the matrix product of $L$ and $U$.
+(b) Solve the linear equation system
+$$
+A x=b, \quad \text { with } \quad b=\left[\begin{array}{l}
+1 \\
+2 \\
+1 \\
+1
+\end{array}\right]
+$$
+using the matrix decomposition from the previous exercise. Check your results using subroutine $1 u_{-} \operatorname{solve}(\mathrm{A}, \mathrm{b})$ from the toolbox. Again inspect the matrix product of $A$ and $x$.
+
+---
+
+(a) To compute the matrices L and U using Gaussian elimination, we perform row operations on matrix A to eliminate the elements below the main diagonal.
+
+Starting with matrix A:
+```
+1   5   2   3
+1   6   8   6
+1   6  11   2
+1   7  17   4
+```
+
+Step 1: Subtract the first row from the second, third, and fourth rows to eliminate the first column entries below the main diagonal:
+```
+1   5   2   3
+0   1   6   3
+0   1   9  -1
+0   2  15   1
+```
+
+Step 2: Subtract twice the second row from the third row to eliminate the second column entry below the main diagonal:
+```
+1   5   2   3
+0   1   6   3
+0   0   -3  -7
+0   2   15   1
+```
+
+Step 3: Add twice the second row to the fourth row to eliminate the second column entry below the main diagonal:
+```
+1   5   2   3
+0   1   6   3
+0   0   -3  -7
+0   0   27   -5
+```
+
+Step 4: Divide the third row by -3 to make the third row's pivot equal to 1:
+```
+1   5   2   3
+0   1   6   3
+0   0   1    7/3
+0   0   27  -5
+```
+
+Step 5: Subtract six times the third row from the second row:
+```
+1   5   2   3
+0   1   0   -5
+0   0   1    7/3
+0   0   27  -5
+```
+
+Step 6: Subtract two times the third row from the first row:
+```
+1   5   0   -1/3
+0   1   0   -5
+0   0   1    7/3
+0   0   27  -5
+```
+
+Step 7: Subtract 27 times the third row from the fourth row:
+```
+1   5   0   -1/3
+0   1   0   -5
+0   0   1    7/3
+0   0   0   -40
+```
+
+The resulting matrices L and U are:
+```
+L = [1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 7/3 1]
+U = [1 5 0 -1/3; 0 1 0 -5; 0 0 1 7/3; 0 0 0 -40]
+```
+
+To check the results using a subroutine, you can use the following code in Julia:
+
+```julia
+using LinearAlgebra
+
+A = [1 5 2 3; 1 6 8 6; 1 6 11 2; 1 7 17 4]
+L, U = lu(A)
+
+println("L:")
+println(L)
+println("U:")
+println(U)
+```
+
+The matrix product of L and U should be equal to matrix A.
+
+(b) To solve the linear equation system Ax = b using the LU decomposition, we can solve two systems of equations: Ly = b and Ux = y.
+
+Using the matrices L and U from part (a) and the given vector b:
+```
+b = [1; 2; 1; 1]
+```
+
+Solving Ly = b, we find y:
+```
+y = L \ b
+```
+
+Solving Ux = y, we find x:
+```
+x = U \ y
+```
+
+To check the results using a subroutine, you can use the following code in Julia:
+
+```julia
+using LinearAlgebra
+
+A = [1 5 2 3; 1 6 8 6; 1 6 11 2; 1 7 17 4]
+b = [1; 2; 1; 1]
+
+x = A \ b
+
+println("Solution x:")
+println(x)
+```
+
+The matrix product of A and x should be equal to vector b.
+
+## Exercise 2 
+
+---
+
