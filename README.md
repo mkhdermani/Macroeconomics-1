@@ -560,11 +560,11 @@ $$
 
 where $r$ defines the interest rate.
 
-(a) Define the Lagrangian for this specific optimization problem and derive first-order conditions with respect to $c_1, c_2$, and $\lambda$. Solve the equation syster analytically using parameter values $\gamma=0.5, \beta=1, r=0$, and $w=1$.
+(a) Define the Lagrangian for this specific optimization problem and derive first-order conditions with respect to $c_1, c_2$, and $\lambda$. Solve the equation system analytically using parameter values $\gamma=0.5, \beta=1, r=0$, and $w=1$.
 
-(b) Solve the equation system resulting from a) using function fzero from the toolbox. Print the results and compare the numerical results with the analytical solutions.
+(b) Solve the equation system resulting from a) using function fsolve from the toolbox. Print the results and compare the numerical results with the analytical solutions.
 
-(c) Solve the household problem using the subroutine fminsearch and compare the results.
+(c) Solve the household problem using the subroutine Optim.jl and compare the results.
 
 ---
 
