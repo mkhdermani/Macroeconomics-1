@@ -589,96 +589,87 @@ Solving equations (1), (2), and (3) simultaneously will give us the optimal valu
 
 Using the given parameter values γ=0.5, β=1, r=0, and w=1, we can substitute them into the equations and solve them analytically.
 
-(b) To solve the equation system resulting from part (a) numerically using the `fzero` function from the toolbox, we need to define a function that represents the system of equations and pass it to `fzero` to find its root.
+Certainly! Let's provide the complete code for both the `fsolve` method and the `Nelder-Mead` method. We will also include explanations for each step along the way.
 
-The function representing the equation system is:
-```
-function equations(c1, c2)
-    eq1 = c1^(-1/γ) - λ
-    eq2 = c2^(-1/γ) - (1 + r) * β * λ
-    eq3 = w - c1 - c2 / (1 + r)
-    return [eq1, eq2, eq3]
-end
-```
-
-We can then use `fzero` to solve the equation system numerically and obtain the values for `c1`, `c2`, and `λ`.
-
-(c) To solve the household problem using the `fminsearch` subroutine, we need to define an objective function that represents the negative of the utility function. The objective function to be minimized is:
-```
-function objective(c)
-    c1 = c[1]
-    c2 = c[2]
-    return -U(c1, c2)
-end
-```
-
-We can pass this objective function to `fminsearch` along with an initial guess for `c1` and `c2` to find the optimal values that maximize utility.
-
-Let's now put it all together in Julia code:
+(b) Solution using `fsolve` (NLsolve package):
 
 ```julia
-using Roots
-using Optim
+using NLsolve
 
 γ = 0.5
-β = 1
-r = 0
-w = 1
+β = 1.0
+r = 0.0
+w = 1.0
 
-# Analytical solution
-λ = 1 / (w^(1/γ))
-c1 = λ^(-γ)
-c2 = (1 + r) * β * λ^(-γ)
+function equations!(F, x)
+    c1 = x[1]
+    c2 = x[2]
+    λ = x[3]
 
-println("Analytical solution:")
+    F[1] = c1^(-1/γ) - λ
+    F[2] = c2^(-1/γ) * λ / (1 + r) - β
+    F[3] = w - c1 - c2 / (1 + r)
+end
+
+# Initial guess
+x0 = [0.5, 0.5, 1.0]
+
+# Solve the system of equations using fsolve
+res = nlsolve(equations!, x0)
+
+c1 = res.zero[1]
+c2 = res.zero[2]
+λ = res.zero[3]
+
+println("Numerical solution using fsolve:")
 println("c1 =", c1)
 println("c2 =", c2)
 println("λ =", λ)
+```
 
-# Numerical solution using fzero
-function equations(c)
-    c1 = c[1]
-    c2 = c[2]
-    eq1 = c1^(-1/γ) - λ
-    eq2 = c2^(-1/γ) - (1 + r) * β * λ
-    eq3 = w - c1 - c2 / (1 + r)
-    return [eq1, eq2, eq3]
+In this code, we define the `equations!` function, which represents the system of equations. It takes the output vector `F` and the input vector `x`. The `nlsolve` function is then used to solve the system of equations by providing the `equations!` function and the initial guess `x0`. The resulting solution is obtained from `res.zero`.
+
+(c) Solution using `Nelder-Mead` method (Optim package):
+
+```julia
+using Optim
+
+γ = 0.5
+β = 1.0
+r = 0.0
+w = 1.0
+
+function U(c1, c2)
+    return c1^(1 - 1/γ) / (1 - 1/γ) + β * c2^(1 - 1/γ) / (1 - 1/γ)
 end
 
-c_initial_guess = [0.5, 0.5]  # Initial guess for c1 and c2
-c_numerical = fzero(equations, c_initial_guess)
-
-println("Numerical solution using fzero:")
-println("c1 =", c_numerical[1])
-println("c2 =", c_numerical[2])
-println("λ =", λ)
-
-# Numerical solution using fminsearch
-U(c1, c2) = c1^(1 - 1/γ) / (1 - 1/γ) + β * c2^(1 - 1/γ) / (1 - 1/γ)
-
-function objective(c)
-    c1 = c[1]
-    c2 = c[2]
+function objective(x)
+    c1 = x[1]
+    c2 = x[2]
     return -U(c1, c2)
 end
 
-res = optimize(objective, c_initial_guess, NelderMead())
+# Initial guess
+x0 = [0.5, 0.5]
 
-c_optimal = Optim.minimizer(res)
+# Solve the optimization problem using Nelder-Mead (fminsearch)
+solution = optimize(objective, x0, NelderMead())
 
-println("Numerical solution using fminsearch:")
-println("c1 =", c_optimal[1])
-println("c2 =", c_optimal[2])
+c1 = solution.minimizer[1]
+c2 = solution.minimizer[2]
+λ = c1^(-1/γ)
+
+println("Numerical solution using Nelder-Mead (fminsearch):")
+println("c1 =", c1)
+println("c2 =", c2)
 println("λ =", λ)
 ```
 
-In this code, we first define the parameters γ, β, r, and w. We then compute the analytical solution by substituting the given parameter values into the equations derived in part (a). The values for c1, c2, and λ are printed as the analytical solution.
+In this code, we define the utility function `U(c1, c2)` and the objective function `objective(x)`, which is the negative of the utility function. The `optimize` function is then used with the `NelderMead()` algorithm to minimize the objective function and find the optimal values of `c1` and `c2`. The resulting solution is obtained from `solution.minimizer`.
 
-Next, we define the equations function that represents the equation system from part (b) and use the fzero function to solve it numerically.
+Both methods provide numerical solutions to the intertemporal household problem. The `fsolve` method solves the system of equations directly, while the `Nelder-Mead` method formulates the problem as an optimization and finds the optimal values by minimizing the objective function.
 
- The initial guess for c1 and c2 is set to [0.5, 0.5]. The values for c1, c2, and λ obtained from fzero are printed as the numerical solution using fzero.
-
-Finally, we define the objective function and use the optimize function with the NelderMead algorithm to solve the problem numerically using fminsearch. The initial guess for c1 and c2 is again set to [0.5, 0.5]. The values for c1, c2, and λ obtained from fminsearch are printed as the numerical solution using fminsearch.
+Please note that the provided code assumes that you have the required packages (`NLsolve` and `Optim`) installed. You can install them by running `using Pkg; Pkg.add("NLsolve")` and `using Pkg; Pkg.add("Optim")` in the Julia REPL, respectively.
 
 ## Exercise 3
 
