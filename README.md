@@ -1453,15 +1453,14 @@ The code will calculate the approximation error between the true profit function
 ---
 
 2.11. Three gravel-pits $A_1, A_2$ and $A_3$ store 11 tons, 13 tons, and 10 tons of gravel, respectively. The gravel is used at four building sites $B_1, B_2, B_3$, and $B_4 . B_1$ orders 5 tons, $B_2 7$ tons, $B_3 13$ tons, and $B_4 6$ tons of gravel. The transport cost of one ton of gravel from pit $A_i$ to the building site $B_j$ are displayed in the following table.
-```math
-\begin{tabular}{rrrrr}
-\hline & $B_1$ & $B_2$ & $B_3$ & $B_4$ \\
-\hline$A_1$ & 10 & 70 & 100 & 80 \\
-$A_2$ & 130 & 90 & 120 & 110 \\
-$A_3$ & 50 & 30 & 80 & 10 \\
-\hline
-\end{tabular}
-```
+
+|       | B1  | B2  | B3  | B4  |
+|-------|-----|-----|-----|-----|
+| A1    | 10  | 70  | 100 | 80  |
+| A2    | 130 | 90  | 120 | 110 |
+| A3    | 50  | 30  | 80  | 10  |
+
+
 Minimize the total cost of transport from gravel pits to the building sites using a simplex algorithm.
 
 ---
