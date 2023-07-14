@@ -398,7 +398,6 @@ Make sure you have the JuMP and GLPK packages installed and imported. If you enc
 
 ---
 
-2.9 Exercises
 2.1. Consider the matrix
 $$
 A=\left[\begin{array}{cccc}
@@ -544,6 +543,138 @@ println(x)
 The matrix product of A and x should be equal to vector b.
 
 ## Exercise 2 
+
+---
+
+2.2. Consider the following intertemporal household problem: The utility function the household is given by
+$$
+U\left(c_1, c_2\right)=\frac{c_1^{1-\frac{1}{\gamma}}}{1-\frac{1}{\gamma}}+\beta \frac{c_2^{1-\frac{1}{\gamma}}}{1-\frac{1}{\gamma}}
+$$
+with $c_1$ and $c_2$ denoting consumption in the first and the second period, respectivel $\gamma$ is the intertemporal elasticity of substitution and $\beta$ defines the time discour factor. The household receives labour income $w$ in the first period and does nc work in the second period. Consequently, the budget constraint is
+$$
+c_1+\frac{c_2}{1+r}=w
+$$
+where $r$ defines the interest rate.
+(a) Define the Lagrangian for this specific optimization problem and derive first-order conditions with respect to $c_1, c_2$, and $\lambda$. Solve the equation syster analytically using parameter values $\gamma=0.5, \beta=1, r=0$, and $w=1$.
+
+(b) Solve the equation system resulting from a) using function fzero from the toolbox. Print the results and compare the numerical results with the analytical solutions.
+(c) Solve the household problem using the subroutine fminsearch and compare the results.
+
+---
+
+(a) To solve the intertemporal household problem analytically, we can define the Lagrangian for the optimization problem and derive the first-order conditions.
+
+The Lagrangian is defined as follows:
+```
+L(c1, c2, λ) = U(c1, c2) + λ * (w - c1 - c2 / (1 + r))
+```
+
+where `U(c1, c2)` is the utility function, `λ` is the Lagrange multiplier, `w` is the labor income, and `r` is the interest rate.
+
+The first-order conditions are obtained by taking the partial derivatives of the Lagrangian with respect to `c1`, `c2`, and `λ` and setting them equal to zero:
+
+```
+∂L/∂c1 = c1^(-1/γ) - λ = 0   -->   c1^(-1/γ) = λ        (1)
+∂L/∂c2 = β * c2^(-1/γ) - λ / (1 + r) = 0   -->   c2^(-1/γ) = (1 + r) * β * λ     (2)
+∂L/∂λ = w - c1 - c2 / (1 + r) = 0     (3)
+```
+
+Solving equations (1), (2), and (3) simultaneously will give us the optimal values for `c1`, `c2`, and `λ`.
+
+Using the given parameter values γ=0.5, β=1, r=0, and w=1, we can substitute them into the equations and solve them analytically.
+
+(b) To solve the equation system resulting from part (a) numerically using the `fzero` function from the toolbox, we need to define a function that represents the system of equations and pass it to `fzero` to find its root.
+
+The function representing the equation system is:
+```
+function equations(c1, c2)
+    eq1 = c1^(-1/γ) - λ
+    eq2 = c2^(-1/γ) - (1 + r) * β * λ
+    eq3 = w - c1 - c2 / (1 + r)
+    return [eq1, eq2, eq3]
+end
+```
+
+We can then use `fzero` to solve the equation system numerically and obtain the values for `c1`, `c2`, and `λ`.
+
+(c) To solve the household problem using the `fminsearch` subroutine, we need to define an objective function that represents the negative of the utility function. The objective function to be minimized is:
+```
+function objective(c)
+    c1 = c[1]
+    c2 = c[2]
+    return -U(c1, c2)
+end
+```
+
+We can pass this objective function to `fminsearch` along with an initial guess for `c1` and `c2` to find the optimal values that maximize utility.
+
+Let's now put it all together in Julia code:
+
+```julia
+using Roots
+using Optim
+
+γ = 0.5
+β = 1
+r = 0
+w = 1
+
+# Analytical solution
+λ = 1 / (w^(1/γ))
+c1 = λ^(-γ)
+c2 = (1 + r) * β * λ^(-γ)
+
+println("Analytical solution:")
+println("c1 =", c1)
+println("c2 =", c2)
+println("λ =", λ)
+
+# Numerical solution using fzero
+function equations(c)
+    c1 = c[1]
+    c2 = c[2]
+    eq1 = c1^(-1/γ) - λ
+    eq2 = c2^(-1/γ) - (1 + r) * β * λ
+    eq3 = w - c1 - c2 / (1 + r)
+    return [eq1, eq2, eq3]
+end
+
+c_initial_guess = [0.5, 0.5]  # Initial guess for c1 and c2
+c_numerical = fzero(equations, c_initial_guess)
+
+println("Numerical solution using fzero:")
+println("c1 =", c_numerical[1])
+println("c2 =", c_numerical[2])
+println("λ =", λ)
+
+# Numerical solution using fminsearch
+U(c1, c2) = c1^(1 - 1/γ) / (1 - 1/γ) + β * c2^(1 - 1/γ) / (1 - 1/γ)
+
+function objective(c)
+    c1 = c[1]
+    c2 = c[2]
+    return -U(c1, c2)
+end
+
+res = optimize(objective, c_initial_guess, NelderMead())
+
+c_optimal = Optim.minimizer(res)
+
+println("Numerical solution using fminsearch:")
+println("c1 =", c_optimal[1])
+println("c2 =", c_optimal[2])
+println("λ =", λ)
+```
+
+In this code, we first define the parameters γ, β, r, and w. We then compute the analytical solution by substituting the given parameter values into the equations derived in part (a). The values for c1, c2, and λ are printed as the analytical solution.
+
+Next, we define the equations function that represents the equation system from part (b) and use the fzero function to solve it numerically.
+
+ The initial guess for c1 and c2 is set to [0.5, 0.5]. The values for c1, c2, and λ obtained from fzero are printed as the numerical solution using fzero.
+
+Finally, we define the objective function and use the optimize function with the NelderMead algorithm to solve the problem numerically using fminsearch. The initial guess for c1 and c2 is again set to [0.5, 0.5]. The values for c1, c2, and λ obtained from fminsearch are printed as the numerical solution using fminsearch.
+
+## Exercise 3
 
 ---
 
