@@ -1292,15 +1292,13 @@ println("Supply Curve: ", supply_curve)
 
 2.10. Now consider a local newspaper which is a monopoly in a region. It serves two distinct customer groups: readers and advertisers. The price of the newspaper $p_R$ is irrelevant for the advertiser, as are the advertising prices $p_A$ for the reader. However, since a higher newspaper price induces lower sales of newspapers, demand for ads will typically fall. On the other hand it is not clear how the demand for newspapers is affected by higher or lower advertising. In order to find out the optimal price combination $\left(p_R^*, p_A^*\right)$ that maximizes profits, the managers of the newspaper vary the two prices and observe the following profits $G\left(p_R, p_A\right)$ :
 
-\begin{tabular}{|c|c|c|c|c|c|}
-\hline & & \multicolumn{4}{|c|}{$\rho_A$} \\
-\hline & & 0.5 & 4.5 & 8.5 & 12.5 \\
-\hline \multirow{4}{*}{$\rho_R$} & 0.5 & 11.5 & 70.9 & 98.3 & 93.7 \\
-\hline & 4.5 & 31.1 & 82.5 & 101.9 & 89.3 \\
-\hline & 8.5 & 18.7 & 62.1 & 73.5 & 52.9 \\
-\hline & 12.5 & -25.7 & 9.7 & 13.1 & -15.5 \\
-\hline
-\end{tabular}
+|       |       | ρₐ=0.5 | ρₐ=4.5 | ρₐ=8.5 | ρₐ=12.5 |
+|-------|-------|--------|--------|--------|---------|
+|       | ρᵣ=0.5 | 11.5   | 70.9   | 98.3   | 93.7    |
+|       | ρᵣ=4.5 | 31.1   | 82.5   | 101.9  | 89.3    |
+|       | ρᵣ=8.5 | 18.7   | 62.1   | 73.5   | 52.9    |
+|       | ρᵣ=12.5| -25.7  | 9.7    | 13.1   | -15.5   |
+
 
 (a) Given this information, construct a two-dimensional spline approximation of the profit function. What is the optimal price combination $\left(p_R^*, p_A^*\right)$ and the resulting optimal profit $G\left(p_R^*, p_A^*\right)$ ? Hint: Set up two equidistant price grids $\mathrm{PR}(0: 3)$ and $\mathrm{PA}(0: 3)$ on the interval $[0.5 ; 12.5]$ using subroutine grid_Cons_Equi. Given profits $\mathrm{G}(0: 3,0: 3)$ the spline coefficients coeff_G can be derived using subroutine spline_interp (G, coeff_G). Next, evaluate the profit function Gplot $(0: \mathrm{Npl}$ ot, $0:$ Nplot) using function spline_eval at each grid point. Finally, find the location of the maximum profit using function maxloc.
 
