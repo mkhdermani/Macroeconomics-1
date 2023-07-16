@@ -45,9 +45,9 @@ b = [30.0, 40.0, 30.0]
 x = A \ b
 
 # Decompose matrix
-lu = lu(A)
-L = lu.L
-U = lu.U
+lu_factors = lu(A)
+L = lu_factors.L
+U = lu_factors.U
 
 # Output
 println("x = ", x)
