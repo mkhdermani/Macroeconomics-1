@@ -1,6 +1,705 @@
 # Chapter 2
 ### Macro of TEIAS
 
+## Porgram 1
+
+```julia
+a = [5.0 - i for i in 1:4]
+b = a .+ 4.0
+x = [1.0 2.0 3.0 4.0; 5.0 6.0 7.0 8.0]
+y = transpose(x)
+z = x * y
+
+println("vector a = ", a)
+println("sum(a) = ", sum(a))
+println("product(a) = ", prod(a))
+println("maxval(a) = ", maximum(a))
+println("maxloc(a) = ", argmax(a))
+println("minval(a) = ", minimum(a))
+println("minloc(a) = ", argmin(a))
+println("cshift(a,-1) = ", circshift(a, -1))
+println("eoshift(a,-1) = ", circshift(a, -1))
+println("all(a<3.0) = ", all(a .< 3.0))
+println("any(a<3.0) = ", any(a .< 3.0))
+println("count(a<3.0) = ", count(a -> a < 3.0, a))
+println("vector b = ", b)
+println("dot product(a, b) = ", dot(a, b))
+println("matrix x = ")
+println(x)
+println("transpose(x) = ")
+println(y)
+println("matmul(x, y) = ")
+println(z)
+
+```
+## Porgram 2
+```julia
+using LinearAlgebra
+
+A = [2.0 0.0 1.0;
+     0.0 4.0 1.0;
+     1.0 1.0 2.0]
+b = [30.0, 40.0, 30.0]
+
+# Solve the system
+x = A \ b
+
+# Decompose matrix
+lu = lu(A)
+L = lu.L
+U = lu.U
+
+# Output
+println("x = ", x)
+println("L = ", L)
+println("U = ", U)
+
+```
+
+## Porgram 3
+```julia
+using LinearAlgebra
+
+A = [2.0 0.0 1.0;
+     0.0 4.0 1.0;
+     1.0 1.0 2.0]
+b = [30.0, 40.0, 30.0]
+
+# Invert A
+Ainv = inv(A)
+
+# Calculate solution
+b = Ainv * b
+
+# Output
+println("x = ", b)
+println("A^-1 = ", Ainv)
+
+```
+
+## Porgram 4
+```julia
+A = [2.0 0.0 1.0;
+     0.0 4.0 1.0;
+     1.0 1.0 2.0]
+b = [30.0, 40.0, 30.0]
+
+Dinv = diagm(1.0 ./ diag(A))
+C = I - Dinv * A
+d = Dinv * b
+
+x = zeros(3)
+xold = zeros(3)
+
+for iter = 1:200
+    x = d + C * xold
+    println(iter, " ", maximum(abs.(x - xold)))
+
+    # Check for convergence
+    if maximum(abs.(x - xold)) < 1e-6
+        println("x = ", x)
+        break
+    end
+
+    xold = x
+end
+
+println("Error: no convergence")
+
+```
+
+## Porgram 5
+```julia
+a = 0.05
+b = 0.25
+fa = 0.5 * a^(-0.2) + 0.5 * a^(-0.5) - 2.0
+fb = 0.5 * b^(-0.2) + 0.5 * b^(-0.5) - 2.0
+
+if fa * fb >= 0.0
+    error("Error: There is no root in [a, b]")
+end
+
+for iter = 1:200
+    x = (a + b) / 2.0
+    fx = 0.5 * x^(-0.2) + 0.5 * x^(-0.5) - 2.0
+    println(iter, " ", abs(x - a))
+
+    if abs(x - a) < 1e-6
+        println("x = ", x, ", f(x) = ", fx)
+        break
+    end
+
+    if fa * fx < 0.0
+        b = x
+        fb = fx
+    else
+        a = x
+        fa = fx
+    end
+end
+
+println("Error: no convergence")
+
+```
+
+## Porgram 6
+```julia
+xold = 0.05
+
+for iter = 1:200
+    f = 0.5 * xold^(-0.2) + 0.5 * xold^(-0.5) - 2.0
+    fprime = -0.1 * xold^(-1.2) - 0.25 * xold^(-1.5)
+
+    x = xold - f / fprime
+    println(iter, " ", abs(x - xold))
+
+    if abs(x - xold) < 1e-6
+        println("x = ", x, ", f(x) = ", f)
+        break
+    end
+
+    xold = x
+end
+
+println("Error: no convergence")
+
+```
+
+## Porgram 7
+```julia
+xold = 0.05
+sigma = 0.2
+
+for iter = 1:200
+    f = 0.5 * xold^(-0.2) + 0.5 * xold^(-0.5) - 2.0
+
+    x = xold + sigma * f
+    println(iter, " ", abs(x - xold))
+
+    if abs(x - xold) < 1e-6
+        println("x = ", x, ", f(x) = ", f)
+        break
+    end
+
+    xold = x
+end
+
+println("Error: no convergence")
+
+```
+
+## Porgram 8
+```julia
+module Globals
+    export eta, c, cournot
+
+    const eta = 1.6
+    const c = [0.6, 0.8]
+
+    function cournot(q)
+        QQ = sum(q)
+        cournot_vals = similar(q)
+
+        for i in eachindex(q)
+            cournot_vals[i] = QQ * (-1 / eta - 1) * q[i] - c[i] * q[i]
+        end
+
+        return cournot_vals
+    end
+end
+
+```
+
+```julia
+include("prog02_08m.jl")
+
+function oligopoly()
+    q = [0.1, 0.1]
+    check = false
+
+    fzero!(q, cournot, check)
+
+    if check
+        error("Error: fzero did not converge")
+    end
+
+    println("Output")
+    println("Firm 1: ", q[1])
+    println("Firm 2: ", q[2])
+    println("Price: ", (q[1] + q[2]) * (-1 / Globals.eta))
+end
+
+oligopoly()
+
+```
+## Porgram 9
+```julia
+function oligopoly2()
+    q = [0.1, 0.1]
+    qold = similar(q)
+    damp = 0.7
+
+    for iter in 1:100
+        QQ = sum(qold)
+        q = (1 / Globals.c') * ((QQ^(-1 / Globals.eta) - 1 / Globals.eta * QQ^(-1 / Globals.eta - 1)) * qold)
+        q = damp * q + (1 - damp) * qold
+
+        println("Iter: ", iter, " ", q[1], " ", q[2])
+
+        if all(abs.(q - qold) .< 1e-6)
+            println("Output")
+            println(q[1], " ", q[2])
+            break
+        end
+
+        qold = q
+    end
+end
+
+oligopoly2()
+
+```
+
+## Porgram 10
+```julia
+p = [1.0, 2.0]
+W = 1.0
+
+a = 0.0
+b = (W - p[1] * 0.01) / p[2]
+
+for iter = 1:200
+    x1 = a + (3.0 - sqrt(5.0)) / 2.0 * (b - a)
+    x2 = a + (sqrt(5.0) - 1.0) / 2.0 * (b - a)
+
+    f1 = -(((W - p[2] * x1) / p[1])^0.4 + (1.0 + x1)^0.5)
+    f2 = -(((W - p[2] * x2) / p[1])^0.4 + (1.0 + x2)^0.5)
+
+    println(iter, " ", abs(b - a))
+
+    if abs(b - a) < 1e-6
+        println("x1 = ", (W - p[2] * x1) / p[1])
+        println("x2 = ", x1)
+        println("u- = ", f1)
+        break
+    end
+
+    if f1 < f2
+        b = x2
+    else
+        a = x1
+    end
+end
+
+```
+
+## Porgram 11
+```julia
+module Globals
+    export p, W, utility
+
+    const p = [1.0, 2.0]
+    const W = 1.0
+
+    function utility(x)
+        utility = -(((W - p[2] * x) / p[1])^0.4 + (1.0 + x)^0.5)
+    end
+end
+
+```
+
+```julia
+include("prog02_11m.jl")
+
+function brentmin()
+    a = 0.0
+    b = (Globals.W - Globals.p[1] * 0.01) / Globals.p[2]
+    x = (a + b) / 2.0
+
+    fminsearch!(x, a, b, Globals.utility)
+
+    println("x1 = ", (Globals.W - Globals.p[2] * x) / Globals.p[1])
+    println("x2 = ", x)
+    println("u- = ", -f)
+end
+
+brentmin()
+
+```
+## Program 12
+```julia
+function NewtonCotes()
+    const n = 10
+    const a = 0.0
+    const b = 2.0
+
+    h = (b - a) / n
+    x = a:h:b
+    w = fill(h, n+1)
+    w[1] /= 2
+    w[end] /= 2
+
+    f = cos.(x)
+
+    println("Numerical: ", sum(w .* f))
+    println("Analytical: ", sin(2.0) - sin(0.0))
+end
+
+NewtonCotes()
+
+```
+
+## Program 13
+```julia
+function GaussLegendre()
+    const n = 10
+    const a = 0.0
+    const b = 2.0
+
+    x, w = legendre(n, a, b)
+
+    f = cos.(x)
+
+    println("Numerical: ", sum(w .* f))
+    println("Analytical: ", sin(2.0) - sin(0.0))
+end
+
+GaussLegendre()
+
+```
+
+## Program 14
+```julia
+module Globals
+    export mu, sig2, minp, n, y, w, market
+
+    const mu = 1.0
+    const sig2 = 0.1
+    const minp = 1.0
+    const n = 10
+    y = zeros(n+1)
+    w = zeros(n+1)
+
+    function market(A)
+        Ep = sum(w .* max.(3.0 - 2.0 * A * y, minp))
+        return A - (0.5 + 0.5 * Ep)
+    end
+end
+
+```
+```julia
+include("prog02_14m.jl")
+
+function agriculture()
+    y, w = normal_discrete(Globals.mu, Globals.sig2)
+
+    A = 1.0
+
+    fzero!(A, Globals.market)
+
+    Ep = sum(w .* max.(3.0 - 2.0 * A .* y, Globals.minp))
+    Varp = sum(w .* ((max.(3.0 - 2.0 .* A .* y, Globals.minp) - Ep).^2))
+
+    # Rest of the program...
+
+end
+
+agriculture()
+
+```
+
+
+## Program 15
+```julia
+using Plots
+
+function uniformPDF(x, a, b)
+    return (x >= a && x <= b) ? 1 / (b - a) : 0
+end
+
+function uniformCDF(x, a, b)
+    return (x < a) ? 0 : (x >= b) ? 1 : (x - a) / (b - a)
+end
+
+a = -1.0
+b = 1.0
+NN = 100
+z = range(a - 0.5, b + 0.5, length=NN+1)
+dens = [uniformPDF(z[i], a, b) for i in 1:length(z)]
+dist = [uniformCDF(z[i], a, b) for i in 1:length(z)]
+
+plot(z, dens, label="Density", legend=:topleft)
+plot!(z, dist, label="Distribution")
+title!("Uniform Distribution")
+
+```
+
+## Program 16
+```julia
+using Plots
+using Distributions
+
+function plot_hist(data, bins; left=nothing, right=nothing)
+    histogram(data, bins=bins, legend=false, xlims=(left, right))
+end
+
+# Uniform distribution simulation
+a = -1.0
+b = 1.0
+x_uniform = rand(Uniform(a, b), 1000)
+plot_hist(x_uniform, 20)
+title!("Uniform Distribution")
+
+# Normal distribution simulation
+mu = 1.0
+sigma = 0.25
+x_normal = rand(Normal(mu, sigma), 1000)
+plot_hist(x_normal, 20, left=mu-3sqrt(sigma), right=mu+3sqrt(sigma))
+title!("Normal Distribution")
+
+# Binomial distribution simulation
+p = 0.25
+n = 12
+x_binomial = rand(Binomial(n, p), 1000)
+plot_hist(x_binomial, n+1, left=-0.5, right=n+0.5)
+title!("Binomial Distribution")
+
+```
+## Porgram 17
+```julia
+using Plots
+
+function runge_function(x)
+    return 1.0 / (1.0 + 25.0 * x^2)
+end
+
+function equidistant_interpolation(xplot, xi, yi)
+    return [lininterp(xi, yi, x) for x in xplot]
+end
+
+function chebyshev_nodes(n)
+    return [cos((2i-1)*pi/(2n)) for i in 1:n]
+end
+
+function chebyshev_interpolation(xplot, xi, yi)
+    return [chebyshev_interpolate(xi, yi, x) for x in xplot]
+end
+
+n = 10
+nplot = 1000
+
+# Get equidistant plot nodes and Runge's function
+xplot = range(-1.0, stop=1.0, length=nplot+1)
+yreal = [runge_function(x) for x in xplot]
+plot(xplot, yreal, label="Original")
+
+# Equidistant polynomial interpolation
+xi = range(-1.0, stop=1.0, length=n+1)
+yi = [runge_function(x) for x in xi]
+yplot = equidistant_interpolation(xplot, xi, yi)
+plot!(xplot, yplot, label="Equidistant")
+
+# Chebyshev polynomial interpolation
+xi = chebyshev_nodes(n)
+yi = [runge_function(x) for x in xi]
+yplot = chebyshev_interpolation(xplot, xi, yi)
+plot!(xplot, yplot, label="Chebyshev")
+
+# Execute plot
+title!("Polynomial Interpolation of Runge's Function")
+xlabel!("x")
+ylabel!("y")
+plot!()
+
+```
+
+## Porgram 18
+```julia
+using Plots
+using CubicSpline
+
+function runge_function(x)
+    return 1.0 / (1.0 + 25.0 * x^2)
+end
+
+function piecewise_linear_interpolation(xplot, xi, yi)
+    yplot = similar(xplot)
+    n = length(xi) - 1
+
+    for ix in 1:length(xplot)
+        il, ir, varphi = linear_interpolation_equidistant(xplot[ix], -1.0, 1.0, n)
+        yplot[ix] = varphi * yi[il] + (1.0 - varphi) * yi[ir]
+    end
+
+    return yplot
+end
+
+function cubic_spline_interpolation(xplot, xi, yi)
+    coeff = CubicSplineCoefficients(xi, yi)
+    yplot = [CubicSplineEvaluate(x, coeff, xi[1], xi[end]) for x in xplot]
+    return yplot
+end
+
+n = 10
+nplot = 1000
+
+# Get nodes and data for interpolation
+xi = range(-1.0, stop=1.0, length=n+1)
+yi = [runge_function(x) for x in xi]
+
+# Get nodes and data for plotting
+xplot = range(-1.0, stop=1.0, length=nplot+1)
+yreal = [runge_function(x) for x in xplot]
+
+plot(xplot, yreal, label="Original")
+
+# Piecewise linear interpolation
+yplot = piecewise_linear_interpolation(xplot, xi, yi)
+plot!(xplot, yplot, label="Piecewise linear")
+
+# Cubic spline interpolation
+yplot = cubic_spline_interpolation(xplot, xi, yi)
+plot!(xplot, yplot, label="Cubic spline")
+
+# Execute plot
+title!("Piecewise Linear and Cubic Spline Interpolation")
+xlabel!("x")
+ylabel!("y")
+plot!()
+
+```
+
+## Porgram 19
+```julia
+using Plots
+using CubicSpline
+
+function runge_function(x, z)
+    return x^2 + sqrt(z)
+end
+
+function piecewise_linear_interpolation(xerr, zerr, xi, zi, yi)
+    nerr = length(xerr)
+    yinterp = similar(xerr)
+
+    for i in 1:nerr
+        ixl, ixr, varphix = linear_interpolation_equidistant(xerr[i], xi[1], xi[end], length(xi)-1)
+        izl, izr, varphiz = linear_interpolation_equidistant(zerr[i], zi[1], zi[end], length(zi)-1)
+
+        if varphix <= varphiz
+            yinterp[i] = varphix * yi[ixl, izl] + (varphiz - varphix) * yi[ixr, izl] + (1.0 - varphiz) * yi[ixr, izr]
+        else
+            yinterp[i] = varphiz * yi[ixl, izl] + (varphix - varphiz) * yi[ixl, izr] + (1.0 - varphix) * yi[ixr, izr]
+        end
+    end
+
+    return yinterp
+end
+
+function cubic_spline_interpolation(xerr, zerr, xi, zi, yi)
+    coeff = CubicSplineCoefficients((xi, zi), yi)
+    yinterp = [CubicSplineEvaluate((x, z), coeff, (xi[1], zi[1]), (xi[end], zi[end])) for (x, z) in zip(xerr, zerr)]
+    return yinterp
+end
+
+nx = 10
+nz = 20
+nerr = 1000
+
+x1 = -1.0
+xr = 2.0
+z1 = 0.5
+zr = 8.0
+
+# Get nodes and data for interpolation
+xi = range(x1, stop=xr, length=nx+1)
+zi = range(z1, stop=zr, length=nz+1)
+yi = [runge_function(x, z) for x in xi, z in zi]
+
+# Get nodes for error calculation
+xerr = range(x1, stop=xr, length=nerr+1)
+zerr = range(z1, stop=zr, length=nerr+1)
+
+# Piecewise linear interpolation
+yinterp = piecewise_linear_interpolation(xerr, zerr, xi, zi, yi)
+
+# Cubic spline interpolation
+yinterp_spline = cubic_spline_interpolation(xerr, zerr, xi, zi, yi)
+
+# Plot interpolated surfaces
+surface(xerr, zerr, yinterp', label="Piecewise Linear")
+surface!(xerr, zerr, yinterp_spline', label="Cubic Spline")
+
+```
+
+## Porgram 20
+```julia
+using LinearAlgebra
+
+function simplex_algorithm(c, A, b)
+    m, n = size(A)
+
+    # Create augmented matrix
+    c_aug = [c; zeros(m)]
+    A_aug = [A eye(m)]
+    b_aug = b
+
+    # Find entering and leaving variables
+    while true
+        entering_idx = argmin(c_aug)
+        entering_var = c_aug[entering_idx]
+
+        if entering_var >= 0
+            # Optimal solution found
+            break
+        end
+
+        # Compute ratios for leaving variable
+        ratios = [b_aug[i] / A_aug[i, entering_idx] for i in 1:m]
+
+        if all(ratios .<= 0)
+            # Problem is unbounded
+            error("Unbounded problem")
+        end
+
+        leaving_idx = argmin(ratios)
+        leaving_var = ratios[leaving_idx]
+
+        # Pivot operation
+        pivot = A_aug[leaving_idx, entering_idx]
+        A_aug[leaving_idx, :] ./= pivot
+        b_aug[leaving_idx] /= pivot
+
+        for i in 1:m
+            if i != leaving_idx
+                factor = A_aug[i, entering_idx]
+                A_aug[i, :] .-= factor .* A_aug[leaving_idx, :]
+                b_aug[i] -= factor * b_aug[leaving_idx]
+            end
+        end
+
+        factor = c_aug[entering_idx]
+        c_aug .-= factor .* A_aug[leaving_idx, :]
+    end
+
+    # Extract solution
+    x = A_aug[:, 1:n] \ b_aug
+
+    return x
+end
+
+c = [-120.0, -40.0]
+A = [1.0 1.0; 4.0 1.0; 20.0 10.0]
+b = [100.0, 160.0, 1100.0]
+
+x = simplex_algorithm(c, A, b)
+
+println("x = ", x)
+println("Constraint 1 = ", b[1] - sum(A[1, :] .* x))
+println("Constraint 2 = ", b[2] - sum(A[2, :] .* x))
+println("Constraint 3 = ", b[3] - sum(A[3, :] .* x))
+
+```
 ## Example 1
 
 ---
